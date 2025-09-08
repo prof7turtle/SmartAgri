@@ -30,7 +30,10 @@ import {
   faBug,
   faSprayCan,
   faWheatAwn,
-  faPlantWilt
+  faPlantWilt,
+  faHandshake,
+  faRupeeSign,
+  faWarehouse
 } from '@fortawesome/free-solid-svg-icons';
 
 const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
@@ -156,6 +159,38 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                       className={`w-5 h-5 ${isActive('/farm-console') ? 'text-green-700' : 'text-gray-500 group-hover:text-gray-900'}`}
                     />
                     {!isCollapsed && <span className="ml-3 whitespace-nowrap">Farm Console</span>}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/crop-management"
+                    className={`flex items-center px-3 py-2.5 rounded-lg ${isCollapsed ? 'justify-center' : ''} ${
+                      isActive('/crop-management') 
+                        ? 'bg-green-100 text-green-800 font-medium' 
+                        : 'text-gray-700 hover:bg-gray-100'
+                    } group transition-colors duration-150`}
+                  >
+                    <FontAwesomeIcon
+                      icon={faWarehouse}
+                      className={`w-5 h-5 ${isActive('/crop-management') ? 'text-green-700' : 'text-gray-500 group-hover:text-gray-900'}`}
+                    />
+                    {!isCollapsed && <span className="ml-3 whitespace-nowrap">Crop Management</span>}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/financial-aid"
+                    className={`flex items-center px-3 py-2.5 rounded-lg ${isCollapsed ? 'justify-center' : ''} ${
+                      isActive('/financial-aid') 
+                        ? 'bg-green-100 text-green-800 font-medium' 
+                        : 'text-gray-700 hover:bg-gray-100'
+                    } group transition-colors duration-150`}
+                  >
+                    <FontAwesomeIcon
+                      icon={faHandshake}
+                      className={`w-5 h-5 ${isActive('/financial-aid') ? 'text-green-700' : 'text-gray-500 group-hover:text-gray-900'}`}
+                    />
+                    {!isCollapsed && <span className="ml-3 whitespace-nowrap">Financial Aid</span>}
                   </Link>
                 </li>
               </ul>
