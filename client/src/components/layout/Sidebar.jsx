@@ -41,7 +41,6 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
   const [expandedMenus, setExpandedMenus] = useState({
     analytics: true,
     pests: false,
-    crops: false,
     irrigation: false
   });
   
@@ -370,84 +369,6 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                             className={`w-4 h-4 mr-2 ${isActive('/pest-treatment') ? 'text-green-700' : 'text-gray-500'}`}
                           />
                           <span>Treatment Advisor</span>
-                        </Link>
-                      </li>
-                    </ul>
-                  )}
-                </li>
-                
-                {/* Crop Management Section */}
-                <li>
-                  <button
-                    type="button"
-                    className={`flex items-center w-full px-3 py-2.5 rounded-lg text-left text-gray-700 ${
-                      isCollapsed ? 'justify-center' : ''
-                    } hover:bg-gray-100 transition-colors duration-150`}
-                    onClick={() => toggleMenu('crops')}
-                  >
-                    <FontAwesomeIcon
-                      icon={faWheatAwn}
-                      className="w-5 h-5 text-gray-500 group-hover:text-gray-900"
-                    />
-                    {!isCollapsed && (
-                      <>
-                        <span className="ml-3 mr-auto font-medium">Crop Management</span>
-                        <FontAwesomeIcon
-                          icon={expandedMenus.crops ? faAngleDown : faAngleRight}
-                          className="w-4 h-4"
-                        />
-                      </>
-                    )}
-                  </button>
-
-                  {expandedMenus.crops && !isCollapsed && (
-                    <ul className="mt-1 pl-7 space-y-1">
-                      <li>
-                        <Link
-                          to="/crop-planning"
-                          className={`flex items-center px-3 py-2 rounded-md ${
-                            isActive('/crop-planning') 
-                              ? 'bg-green-50 text-green-800' 
-                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                          } transition-colors duration-150`}
-                        >
-                          <FontAwesomeIcon
-                            icon={faWheatAwn}
-                            className={`w-4 h-4 mr-2 ${isActive('/crop-planning') ? 'text-green-700' : 'text-gray-500'}`}
-                          />
-                          <span>Crop Planning</span>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          to="/crop-health"
-                          className={`flex items-center px-3 py-2 rounded-md ${
-                            isActive('/crop-health') 
-                              ? 'bg-green-50 text-green-800' 
-                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                          } transition-colors duration-150`}
-                        >
-                          <FontAwesomeIcon
-                            icon={faPlantWilt}
-                            className={`w-4 h-4 mr-2 ${isActive('/crop-health') ? 'text-green-700' : 'text-gray-500'}`}
-                          />
-                          <span>Health Monitoring</span>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          to="/crop-yield"
-                          className={`flex items-center px-3 py-2 rounded-md ${
-                            isActive('/crop-yield') 
-                              ? 'bg-green-50 text-green-800' 
-                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                          } transition-colors duration-150`}
-                        >
-                          <FontAwesomeIcon
-                            icon={faChartLine}
-                            className={`w-4 h-4 mr-2 ${isActive('/crop-yield') ? 'text-green-700' : 'text-gray-500'}`}
-                          />
-                          <span>Yield Prediction</span>
                         </Link>
                       </li>
                     </ul>
