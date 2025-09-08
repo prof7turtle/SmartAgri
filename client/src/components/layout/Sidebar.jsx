@@ -26,14 +26,20 @@ import {
   faWater,
   faSeedling,
   faCloudRain,
-  faWarning
+  faWarning,
+  faBug,
+  faSprayCan,
+  faWheatAwn,
+  faPlantWilt
 } from '@fortawesome/free-solid-svg-icons';
 
 const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
   const location = useLocation();
   const [expandedMenus, setExpandedMenus] = useState({
     analytics: true,
-    market_place: false
+    pests: false,
+    crops: false,
+    irrigation: false
   });
   
   // Detect screen size for responsive behavior
@@ -155,14 +161,15 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
               </ul>
             </div>
 
-            {/* Analytics Section */}
+            {/* Analytics Sections */}
             <div className={`px-3 py-2 ${!isCollapsed && 'mb-1'}`}>
               {!isCollapsed && (
                 <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Analytics
                 </h3>
               )}
-              <ul className="mt-1">
+              <ul className="mt-1 space-y-1">
+                {/* Climate Analysis Section */}
                 <li>
                   <button
                     type="button"
@@ -214,26 +221,10 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                           } transition-colors duration-150`}
                         >
                           <FontAwesomeIcon
-                            icon={faSeedling}
+                            icon={faLeaf}
                             className={`w-4 h-4 mr-2 ${isActive('/vegetation') ? 'text-green-700' : 'text-gray-500'}`}
                           />
                           <span>Vegetation Health</span>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          to="/water"
-                          className={`flex items-center px-3 py-2 rounded-md ${
-                            isActive('/water') 
-                              ? 'bg-green-50 text-green-800' 
-                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                          } transition-colors duration-150`}
-                        >
-                          <FontAwesomeIcon
-                            icon={faWater}
-                            className={`w-4 h-4 mr-2 ${isActive('/water') ? 'text-green-700' : 'text-gray-500'}`}
-                          />
-                          <span>Irrigation</span>
                         </Link>
                       </li>
                       <li>
@@ -282,6 +273,208 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                             className={`w-4 h-4 mr-2 ${isActive('/soil') ? 'text-green-700' : 'text-gray-500'}`}
                           />
                           <span>Soil Info</span>
+                        </Link>
+                      </li>
+                    </ul>
+                  )}
+                </li>
+                
+                {/* Pest Detection Section */}
+                <li>
+                  <button
+                    type="button"
+                    className={`flex items-center w-full px-3 py-2.5 rounded-lg text-left text-gray-700 ${
+                      isCollapsed ? 'justify-center' : ''
+                    } hover:bg-gray-100 transition-colors duration-150`}
+                    onClick={() => toggleMenu('pests')}
+                  >
+                    <FontAwesomeIcon
+                      icon={faBug}
+                      className="w-5 h-5 text-gray-500 group-hover:text-gray-900"
+                    />
+                    {!isCollapsed && (
+                      <>
+                        <span className="ml-3 mr-auto font-medium">Pest Detection</span>
+                        <FontAwesomeIcon
+                          icon={expandedMenus.pests ? faAngleDown : faAngleRight}
+                          className="w-4 h-4"
+                        />
+                      </>
+                    )}
+                  </button>
+
+                  {expandedMenus.pests && !isCollapsed && (
+                    <ul className="mt-1 pl-7 space-y-1">
+                      <li>
+                        <Link
+                          to="/pest-monitor"
+                          className={`flex items-center px-3 py-2 rounded-md ${
+                            isActive('/pest-monitor') 
+                              ? 'bg-green-50 text-green-800' 
+                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                          } transition-colors duration-150`}
+                        >
+                          <FontAwesomeIcon
+                            icon={faBug}
+                            className={`w-4 h-4 mr-2 ${isActive('/pest-monitor') ? 'text-green-700' : 'text-gray-500'}`}
+                          />
+                          <span>Monitor & Detect</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/pest-treatment"
+                          className={`flex items-center px-3 py-2 rounded-md ${
+                            isActive('/pest-treatment') 
+                              ? 'bg-green-50 text-green-800' 
+                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                          } transition-colors duration-150`}
+                        >
+                          <FontAwesomeIcon
+                            icon={faSprayCan}
+                            className={`w-4 h-4 mr-2 ${isActive('/pest-treatment') ? 'text-green-700' : 'text-gray-500'}`}
+                          />
+                          <span>Treatment Advisor</span>
+                        </Link>
+                      </li>
+                    </ul>
+                  )}
+                </li>
+                
+                {/* Crop Management Section */}
+                <li>
+                  <button
+                    type="button"
+                    className={`flex items-center w-full px-3 py-2.5 rounded-lg text-left text-gray-700 ${
+                      isCollapsed ? 'justify-center' : ''
+                    } hover:bg-gray-100 transition-colors duration-150`}
+                    onClick={() => toggleMenu('crops')}
+                  >
+                    <FontAwesomeIcon
+                      icon={faWheatAwn}
+                      className="w-5 h-5 text-gray-500 group-hover:text-gray-900"
+                    />
+                    {!isCollapsed && (
+                      <>
+                        <span className="ml-3 mr-auto font-medium">Crop Management</span>
+                        <FontAwesomeIcon
+                          icon={expandedMenus.crops ? faAngleDown : faAngleRight}
+                          className="w-4 h-4"
+                        />
+                      </>
+                    )}
+                  </button>
+
+                  {expandedMenus.crops && !isCollapsed && (
+                    <ul className="mt-1 pl-7 space-y-1">
+                      <li>
+                        <Link
+                          to="/crop-planning"
+                          className={`flex items-center px-3 py-2 rounded-md ${
+                            isActive('/crop-planning') 
+                              ? 'bg-green-50 text-green-800' 
+                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                          } transition-colors duration-150`}
+                        >
+                          <FontAwesomeIcon
+                            icon={faWheatAwn}
+                            className={`w-4 h-4 mr-2 ${isActive('/crop-planning') ? 'text-green-700' : 'text-gray-500'}`}
+                          />
+                          <span>Crop Planning</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/crop-health"
+                          className={`flex items-center px-3 py-2 rounded-md ${
+                            isActive('/crop-health') 
+                              ? 'bg-green-50 text-green-800' 
+                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                          } transition-colors duration-150`}
+                        >
+                          <FontAwesomeIcon
+                            icon={faPlantWilt}
+                            className={`w-4 h-4 mr-2 ${isActive('/crop-health') ? 'text-green-700' : 'text-gray-500'}`}
+                          />
+                          <span>Health Monitoring</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/crop-yield"
+                          className={`flex items-center px-3 py-2 rounded-md ${
+                            isActive('/crop-yield') 
+                              ? 'bg-green-50 text-green-800' 
+                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                          } transition-colors duration-150`}
+                        >
+                          <FontAwesomeIcon
+                            icon={faChartLine}
+                            className={`w-4 h-4 mr-2 ${isActive('/crop-yield') ? 'text-green-700' : 'text-gray-500'}`}
+                          />
+                          <span>Yield Prediction</span>
+                        </Link>
+                      </li>
+                    </ul>
+                  )}
+                </li>
+                
+                {/* Irrigation Management Section */}
+                <li>
+                  <button
+                    type="button"
+                    className={`flex items-center w-full px-3 py-2.5 rounded-lg text-left text-gray-700 ${
+                      isCollapsed ? 'justify-center' : ''
+                    } hover:bg-gray-100 transition-colors duration-150`}
+                    onClick={() => toggleMenu('irrigation')}
+                  >
+                    <FontAwesomeIcon
+                      icon={faWater}
+                      className="w-5 h-5 text-gray-500 group-hover:text-gray-900"
+                    />
+                    {!isCollapsed && (
+                      <>
+                        <span className="ml-3 mr-auto font-medium">Irrigation</span>
+                        <FontAwesomeIcon
+                          icon={expandedMenus.irrigation ? faAngleDown : faAngleRight}
+                          className="w-4 h-4"
+                        />
+                      </>
+                    )}
+                  </button>
+
+                  {expandedMenus.irrigation && !isCollapsed && (
+                    <ul className="mt-1 pl-7 space-y-1">
+                      <li>
+                        <Link
+                          to="/water-management"
+                          className={`flex items-center px-3 py-2 rounded-md ${
+                            isActive('/water-management') 
+                              ? 'bg-green-50 text-green-800' 
+                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                          } transition-colors duration-150`}
+                        >
+                          <FontAwesomeIcon
+                            icon={faDroplet}
+                            className={`w-4 h-4 mr-2 ${isActive('/water-management') ? 'text-green-700' : 'text-gray-500'}`}
+                          />
+                          <span>Water Management</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/irrigation-schedule"
+                          className={`flex items-center px-3 py-2 rounded-md ${
+                            isActive('/irrigation-schedule') 
+                              ? 'bg-green-50 text-green-800' 
+                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                          } transition-colors duration-150`}
+                        >
+                          <FontAwesomeIcon
+                            icon={faWater}
+                            className={`w-4 h-4 mr-2 ${isActive('/irrigation-schedule') ? 'text-green-700' : 'text-gray-500'}`}
+                          />
+                          <span>Schedule & Control</span>
                         </Link>
                       </li>
                     </ul>
