@@ -8,6 +8,9 @@ import {
 import { useAppContext } from '../context/AppContext';
 import { fetchFieldData } from '../services/dataService';
 
+// Add custom CSS for typing indicator and responsive design
+import './AIAssistant.css';
+
 // Groq API Configuration - Using environment variables for secure key storage
 const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 const GROQ_API_URL = import.meta.env.VITE_GROQ_API_URL || "https://api.groq.com/openai/v1/chat/completions";
@@ -382,25 +385,25 @@ const AIAssistant = () => {
   return (
     <div className="flex flex-col h-[calc(100vh-6rem)] bg-gradient-to-br from-white to-green-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-emerald-900 to-green-800 p-4 shadow-md">
+      <div className="bg-gradient-to-r from-emerald-900 to-green-800 p-3 md:p-4 shadow-md sticky top-0 z-10">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center">
-            <div className="bg-white p-2 rounded-full shadow-md mr-4">
+            <div className="bg-white p-1.5 md:p-2 rounded-full shadow-md mr-3 md:mr-4 flex-shrink-0">
               <img
                 src="/farmer-avatar.svg"
                 alt="AgriSense AI"
-                className="w-10 h-10"
+                className="w-8 h-8 md:w-10 md:h-10"
                 onError={(e) => {
                   e.target.onerror = null; 
                   e.target.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0QTkwRTIiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjAgMjFWMTlDMjAgMTYuNzkwOSAxOC4yMDkxIDE1IDE2IDE1SDggQzUuNzkwODYgMTUgNCAxNi43OTA5IDQgMTlWMjEiPjwvcGF0aD48Y2lyY2xlIGN4PSIxMiIgY3k9IjciIHI9IjQiPjwvY2lyY2xlPjwvc3ZnPg==';
                 }}
               />
             </div>
-            <div>
-              <h1 className="text-xl font-bold text-white flex items-center">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-lg md:text-xl font-bold text-white flex items-center truncate">
                 AgriSense AI Assistant
               </h1>
-              <p className="text-sm text-green-50">Your smart farming companion for personalized agricultural insights</p>
+              <p className="text-xs md:text-sm text-green-50 truncate">Your smart farming companion for personalized agricultural insights</p>
             </div>
           </div>
         </div>
@@ -408,66 +411,42 @@ const AIAssistant = () => {
 
       {/* Category selector */}
       {chatView !== 'main' && (
-        <div className="bg-green-50 px-4 py-2 border-b border-green-100 shadow-sm">
+        <div className="bg-green-50 px-3 md:px-4 py-2 border-b border-green-100 shadow-sm">
           <div className="max-w-5xl mx-auto flex items-center">
             <button 
               onClick={handleBackToMain}
-              className="flex items-center text-green-700 text-sm hover:text-green-800"
+              className="flex items-center text-green-700 text-xs md:text-sm hover:text-green-800"
             >
-              <FontAwesomeIcon icon={faArrowLeft} className="mr-1.5" size="sm" />
-              <span>Back to main chat</span>
+              <FontAwesomeIcon icon={faArrowLeft} className="mr-1" size="sm" />
+              <span>Back to main</span>
             </button>
             <span className="mx-2 text-green-700">|</span>
-            <span className="text-green-700 font-medium text-sm capitalize">{chatView} Assistance</span>
+            <span className="text-green-700 font-medium text-xs md:text-sm capitalize">{chatView} Assistance</span>
           </div>
         </div>
       )}
       
       {/* Main content */}
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-5xl mx-auto p-4 md:p-6">
-          {/* Welcome card */}
-          {/* {messages.some(msg => msg.isIntroduction) && (
-            <div className="bg-gradient-to-r from-green-600 to-green-500 rounded-xl p-5 text-white shadow-lg mb-6 max-w-3xl mx-auto">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="bg-white/20 p-2 rounded-full">
-                  <FontAwesomeIcon icon={faSeedling} size="lg" />
-                </div>
-                <h3 className="font-semibold text-lg">AgriSense AI</h3>
-              </div>
-              <p className="text-sm md:text-base">
-                नमस्ते, किसान मित्र! 👋 I'm your smart farming companion, powered by advanced agricultural intelligence. 
-                I can help with weather forecasts, crop recommendations, market insights, and field analytics to 
-                optimize your farming operations.
-              </p>
-              <div className="mt-4 bg-white/10 rounded-lg p-3">
-                <p className="text-sm font-medium mb-2">Try asking me about:</p>
-                <div className="flex flex-wrap gap-2">
-                  <span className="text-xs bg-white/20 rounded-full px-3 py-1">Weather forecasts</span>
-                  <span className="text-xs bg-white/20 rounded-full px-3 py-1">Crop diseases</span>
-                  <span className="text-xs bg-white/20 rounded-full px-3 py-1">Market prices</span>
-                  <span className="text-xs bg-white/20 rounded-full px-3 py-1">Soil health</span>
-                </div>
-              </div>
-            </div>
-          )} */}
+        <div className="max-w-5xl mx-auto p-3 md:p-6">
+          {/* Welcome card - Removed for simplicity */}
 
           {/* Categories in main view */}
           {chatView === 'main' && messages.length < 3 && (
-            <div className="max-w-4xl mx-auto mb-6 mt-4">
-              <h3 className="text-lg font-medium text-gray-700 mb-4">How can I assist you today?</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="max-w-4xl mx-auto mb-4 md:mb-6 mt-2 md:mt-4">
+              <h3 className="text-base md:text-lg font-medium text-gray-700 mb-3 md:mb-4 px-1">How can I assist you today?</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
                 {chatCategories.map((category) => (
                   <button
                     key={category.id}
-                    className="flex flex-col items-center bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow border border-gray-100"
+                    className="flex flex-col items-center bg-white rounded-lg md:rounded-xl p-3 md:p-5 shadow-sm hover:shadow-md transition-shadow border border-gray-100"
                     onClick={() => handleCategorySelect(category.id)}
                   >
-                    <div className={`w-16 h-16 ${category.color} rounded-full flex items-center justify-center mb-3 shadow-sm`}>
-                      <FontAwesomeIcon icon={category.icon} size="lg" className="text-white" />
+                    <div className={`w-12 h-12 md:w-16 md:h-16 ${category.color} rounded-full flex items-center justify-center mb-2 md:mb-3 shadow-sm`}>
+                      <FontAwesomeIcon icon={category.icon} size="1x" className="text-white" />
                     </div>
-                    <h4 className="font-medium text-gray-800">{category.title}</h4>
-                    <p className="text-xs text-gray-500 mt-2 text-center">{category.description}</p>
+                    <h4 className="font-medium text-gray-800 text-sm md:text-base">{category.title}</h4>
+                    <p className="text-xs text-gray-500 mt-1 md:mt-2 text-center hidden sm:block">{category.description}</p>
                   </button>
                 ))}
               </div>
@@ -475,28 +454,28 @@ const AIAssistant = () => {
           )}
 
           {/* Messages */}
-          <div className="space-y-6 max-w-3xl mx-auto">
+          <div className="space-y-4 md:space-y-6 max-w-3xl mx-auto px-1 chat-container">
             {messages.filter(msg => !msg.isIntroduction).map((msg) => (
               <div
                 key={msg.id}
                 className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-md md:max-w-xl rounded-2xl ${
+                  className={`max-w-[85%] sm:max-w-md md:max-w-xl rounded-xl md:rounded-2xl ${
                     msg.sender === 'user'
-                      ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-tr-none py-3 px-4'
-                      : 'bg-white shadow-md border-l-4 border-green-400 text-gray-800 rounded-tl-none py-3 px-4'
+                      ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-tr-none py-2 px-3 md:py-3 md:px-4'
+                      : 'bg-white shadow-sm md:shadow-md border-l-3 md:border-l-4 border-green-400 text-gray-800 rounded-tl-none py-2 px-3 md:py-3 md:px-4'
                   }`}
                 >
                   {msg.icon && msg.sender === 'bot' && (
-                    <div className="flex items-center mb-2 text-green-600">
-                      <FontAwesomeIcon icon={msg.icon} className="mr-2" />
+                    <div className="flex items-center mb-1.5 md:mb-2 text-green-600">
+                      <FontAwesomeIcon icon={msg.icon} className="text-xs md:text-sm mr-2" />
                       <div className="h-px flex-grow bg-gray-200"></div>
                     </div>
                   )}
-                  <div className="text-sm md:text-base">{msg.text}</div>
+                  <div className="text-xs md:text-base break-words">{msg.text}</div>
                   <div
-                    className={`text-xs mt-2 text-right ${
+                    className={`text-[10px] md:text-xs mt-1.5 md:mt-2 text-right ${
                       msg.sender === 'user' ? 'text-blue-100' : 'text-gray-400'
                     }`}
                   >
@@ -508,11 +487,11 @@ const AIAssistant = () => {
             
             {/* Typing indicator */}
             {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-white shadow-md border-l-4 border-green-400 rounded-2xl py-4 px-5 rounded-tl-none max-w-md">
+              <div className="flex justify-start px-1">
+                <div className="bg-white shadow-sm md:shadow-md border-l-3 md:border-l-4 border-green-400 rounded-xl md:rounded-2xl py-3 px-3 md:px-4 rounded-tl-none max-w-[85%] sm:max-w-md">
                   <div className="flex items-center">
-                    <div className="w-7 h-7 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                      <FontAwesomeIcon icon={faSpinner} className="text-green-600 animate-spin" />
+                    <div className="w-5 h-5 md:w-7 md:h-7 bg-green-100 rounded-full flex items-center justify-center mr-2 md:mr-3">
+                      <FontAwesomeIcon icon={faSpinner} className="text-green-600 text-xs md:text-sm animate-spin" />
                     </div>
                     <div className="typing-indicator">
                       <span></span>
@@ -528,52 +507,36 @@ const AIAssistant = () => {
         </div>
       </div>
       
-      {/* Suggested questions */}
-      {/* {suggestedQuestions.length > 0 && !isLoading && (
-        <div className="bg-white px-6 py-3 border-t border-gray-100">
-          <div className="max-w-3xl mx-auto">
-            <p className="text-xs text-gray-500 mb-2 font-medium">SUGGESTED QUESTIONS:</p>
-            <div className="flex flex-wrap gap-2">
-              {suggestedQuestions.map((question, index) => (
-                <button
-                  key={index}
-                  className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full px-3 py-2 transition-colors"
-                  onClick={() => handleSuggestedQuestionClick(question)}
-                >
-                  {question}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )} */}
+      {/* Suggested questions section - commented out */}
       
       {/* Input area */}
-      <div className="p-4 md:p-5 bg-white border-t border-gray-200 shadow-inner">
+      <div className="p-3 md:p-4 lg:p-5 pb-18 bg-white border-t border-gray-200 shadow-inner sticky bottom-0 z-10">
         <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 md:gap-2">
             <div className="flex-1 relative">
               <input
                 type="text"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Ask anything about farming, crops, weather..."
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Ask about farming, crops, weather..."
+                className="w-full bg-gray-50 border border-gray-200 rounded-lg md:rounded-xl text-sm py-2.5 md:py-3 px-3 md:px-4 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 disabled={isLoading}
+                autoComplete="off"
               />
             </div>
             <button
               type="submit"
               disabled={!message.trim() || isLoading}
-              className={`bg-gradient-to-r from-emerald-600 to-green-500 text-white rounded-xl p-3 transition-all hover:shadow-lg disabled:opacity-50 disabled:hover:shadow-none`}
+              aria-label="Send message"
+              className={`bg-gradient-to-r from-emerald-600 to-green-500 text-white rounded-lg md:rounded-xl p-2.5 md:p-3 min-w-[42px] min-h-[42px] flex items-center justify-center transition-all hover:shadow-lg disabled:opacity-50 disabled:hover:shadow-none`}
             >
-              <FontAwesomeIcon icon={faPaperPlane} />
+              <FontAwesomeIcon icon={faPaperPlane} className="text-sm md:text-base" />
             </button>
           </div>
-          <div className="flex items-center justify-center mt-3 gap-1">
-            <FontAwesomeIcon icon={faLeaf} className="text-green-500 text-xs" />
-            <span className="text-xs text-gray-500">Powered by SmartAgri | Farming Intelligence</span>
-          </div>
+          {/* <div className="flex items-center justify-center mt-2 md:mt-3 gap-1">
+            <FontAwesomeIcon icon={faLeaf} className="text-green-500 text-[10px] md:text-xs" />
+            <span className="text-[10px] md:text-xs text-gray-500">Powered by SmartAgri | Farming Intelligence</span>
+          </div> */}
         </form>
       </div>
     </div>

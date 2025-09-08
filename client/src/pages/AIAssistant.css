@@ -1,0 +1,102 @@
+/* AIAssistant.css - Responsive styling for AI Assistant component */
+
+/* Custom typing indicator animation */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+}
+
+.typing-indicator span {
+  height: 8px;
+  width: 8px;
+  float: left;
+  margin: 0 2px;
+  background-color: #4ade80;
+  display: block;
+  border-radius: 50%;
+  opacity: 0.4;
+}
+
+@media (min-width: 768px) {
+  .typing-indicator span {
+    height: 10px;
+    width: 10px;
+    margin: 0 3px;
+  }
+}
+
+.typing-indicator span:nth-of-type(1) {
+  animation: 1s blink infinite 0.3333s;
+}
+
+.typing-indicator span:nth-of-type(2) {
+  animation: 1s blink infinite 0.6666s;
+}
+
+.typing-indicator span:nth-of-type(3) {
+  animation: 1s blink infinite 0.9999s;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Custom scrollbar for the chat area */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background-color: #e2e8f0;
+  border-radius: 20px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background-color: #cbd5e1;
+}
+
+/* Responsive styles */
+@media (max-width: 640px) {
+  /* Small devices */
+  .border-l-3 {
+    border-left-width: 3px;
+  }
+  
+  /* Improve tap targets on mobile */
+  button {
+    min-height: 42px;
+  }
+  
+  /* Make sure text doesn't overflow on small screens */
+  .break-words {
+    word-break: break-word;
+  }
+}
+
+/* Ensure message bubbles don't get too small on tiny screens */
+@media (max-width: 360px) {
+  .max-w-\[85\%\] {
+    max-width: 90%;
+  }
+}
+
+/* Improve performance on mobile devices */
+.chat-container {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000;
+  will-change: transform;
+}
+
+/* Smooth transition between chat views */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
