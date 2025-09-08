@@ -68,225 +68,311 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
   return (
     <aside 
       id="sidebar"
-      className={`fixed top-0 left-0 z-40 h-screen pt-14 transition-all duration-300 ease-in-out bg-white border-r border-gray-300 ${
+      className={`fixed top-0 left-0 z-40 h-screen pt-14 transition-all duration-300 ease-in-out bg-gradient-to-b from-white to-gray-50 border-r border-gray-200 shadow-sm ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-      } ${isMobile ? 'w-72' : ''} ${!isMobile && isCollapsed ? 'md:w-15.5' : 'md:w-63'}` }
+      } ${isMobile ? 'w-72' : ''} ${!isMobile && isCollapsed ? 'md:w-20' : 'md:w-64'}` }
       aria-label="Sidebar"
     >
-      <div className="h-100% px-0 overflow-y-auto">
-        <div className="flex items-center justify-between py-0 px-0 h-7">      
-          {/* Toggle button - only visible on desktop */}
-          <button 
-            onClick={toggleSidebar} 
-            type="button" 
-            className="hidden md:inline-flex items-center justify-center p-1 rounded-lg text-gray-500 hover:bg-gray-100"
-            aria-expanded={!isCollapsed}
-          >
-            <FontAwesomeIcon icon={isCollapsed ? faChevronRight : faChevronLeft} className="w-5 h-5" />
-            <span className="sr-only">Toggle sidebar</span>
-          </button>
-        </div>
-        
-        {/* <div style={{marginTop: "16px", width: "100%"}} className="border-t border-gray-500"></div> */}
-        
-        {/* Navigation Links */}
-        <ul className="space-y-0">
-          <li>
-            <Link
-              to="/"
-              className={`flex items-center ${isCollapsed ? 'justify-center' : 'pl-5'} ${
-                isActive('/') ? 'bg-green-100 text-green-800' : 'text-gray-900 hover:bg-gray-100'
-              } group`}
+      <div className="h-full flex flex-col justify-between overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300">
+        <div>
+          {/* Top section with logo & collapse button */}
+          <div className="flex items-center justify-between py-2 px-3 border-b border-gray-200">
+            {!isCollapsed && (
+              <div className="flex items-center space-x-2">
+                <span className="font-bold text-green-700 text-lg">Smart Agri</span>
+              </div>
+            )}
+            
+            {/* Toggle button */}
+            <button 
+              onClick={toggleSidebar} 
+              type="button" 
+              className={`${isCollapsed ? 'mx-auto' : ''} inline-flex items-center justify-center p-1.5 rounded-lg text-gray-600 hover:bg-green-50 hover:text-green-700 transition-colors`}
+              aria-expanded={!isCollapsed}
             >
-              <div style={{fontSize: "19px"}} className="dashboard-icon text-gray-500 group-hover:text-gray-900"><MdDashboard /></div>
-              
-              {!isCollapsed && <span className="flex-1 ml-5 whitespace-nowrap">Dashboard</span>}
-            </Link>
-          </li>
-
-          <li>
-            <Link
-              to="/reports"
-              className={`flex items-center ${isCollapsed ? 'justify-center' : 'pl-5'} ${
-                isActive('/reports') ? 'bg-green-100 text-green-800' : 'text-gray-900 hover:bg-gray-100'
-              } group`}
-            >
-              <div style={{fontSize: "19px"}} className="report-icon mt-0 text-gray-500 group-hover:text-gray-900"><MdStorage /></div>
-              
-              {!isCollapsed && <span className="flex-1 ml-5.5 whitespace-nowrap">Reports</span>}
-            </Link>
-          </li>
-          
-          <li>
-            <Link
-              to="/farm-console"
-              className={`flex items-center ${isCollapsed ? 'justify-center' : 'pl-5'} ${
-                isActive('/farm-console') 
-                  ? 'bg-green-100 text-green-800' 
-                  : 'text-gray-900 hover:bg-gray-100'
-              } group`}
-            >
-              <FontAwesomeIcon icon={faUserGear} className={`w-5 h-5 text-gray-500 transition ${isActive('/farm-console') ? 'text-green-700' : 'group-hover:text-gray-900'}`} />
-              {!isCollapsed && <span className="flex-1 ml-5.5 whitespace-nowrap">Farm Console</span>}
-            </Link>
-          </li>
-
-          {/* Analytics Section */}
-          <li>
-            <button
-              type="button"
-              className={`flex items-center w-full text-base transition duration-75 group ${
-                isCollapsed ? 'justify-center' : ''
-              } text-gray-900 hover:bg-gray-100`}
-              onClick={() => toggleMenu('analytics')}
-            >
-              {!isCollapsed && (
-                <>
-                  <span style={{fontWeight: "500"}} className="flex-1 ml-3 text-left whitespace-nowrap">Climate Analysis</span>
-                  <FontAwesomeIcon
-                    icon={expandedMenus.analytics ? faAngleDown : faAngleRight}
-                  />
-                </>
-              )}
+              <FontAwesomeIcon icon={isCollapsed ? faChevronRight : faChevronLeft} className="w-4 h-4" />
+              <span className="sr-only">Toggle sidebar</span>
             </button>
-
-            {expandedMenus.analytics && (
-              <ul className="py-0 space-y-0">
+          </div>
+          
+          {/* Navigation Links */}
+          <nav className="mt-2">
+            <div className={`px-3 py-2 ${!isCollapsed && 'mb-1'}`}>
+              {!isCollapsed && (
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Main
+                </h3>
+              )}
+              <ul className="mt-1 space-y-1">
                 <li>
                   <Link
-                    to="/climate"
-                    className={`flex items-center ${isCollapsed ? 'justify-center' : 'pl-5'} w-full text-base transition duration-75 ${
-                      isActive('/climate') ? 'bg-green-100 text-green-800' : 'text-gray-900 hover:bg-gray-100'
-                    } group`}
+                    to="/"
+                    className={`flex items-center px-3 py-2.5 rounded-lg ${isCollapsed ? 'justify-center' : ''} ${
+                      isActive('/') 
+                        ? 'bg-green-100 text-green-800 font-medium' 
+                        : 'text-gray-700 hover:bg-gray-100'
+                    } group transition-colors duration-150`}
                   >
                     <FontAwesomeIcon
-                      icon={faCloudSunRain}
-                      className={`w-5 h-5 ${isActive('/climate') ? 'text-green-700' : 'text-gray-500 group-hover:text-gray-900'}`}
+                      icon={faHome}
+                      className={`w-5 h-5 ${isActive('/') ? 'text-green-700' : 'text-gray-500 group-hover:text-gray-900'}`}
                     />
-                    {!isCollapsed && <span className="ml-5.5">Weather Forecast</span>}
+                    {!isCollapsed && <span className="ml-3 whitespace-nowrap">Dashboard</span>}
                   </Link>
                 </li>
                 <li>
                   <Link
-                    to="/vegetation"
-                    className={`flex items-center ${isCollapsed ? 'justify-center' : 'pl-5'} w-full text-base transition duration-75 ${
-                      isActive('/vegetation') ? 'bg-green-100 text-green-800' : 'text-gray-900 hover:bg-gray-100'
-                    } group`}
+                    to="/reports"
+                    className={`flex items-center px-3 py-2.5 rounded-lg ${isCollapsed ? 'justify-center' : ''} ${
+                      isActive('/reports') 
+                        ? 'bg-green-100 text-green-800 font-medium' 
+                        : 'text-gray-700 hover:bg-gray-100'
+                    } group transition-colors duration-150`}
                   >
                     <FontAwesomeIcon
-                      icon={faLeaf}
-                      className={`w-5 h-5 ${isActive('/vegetation') ? 'text-green-700' : 'text-gray-500 group-hover:text-gray-900'}`}
+                      icon={faChartArea}
+                      className={`w-5 h-5 ${isActive('/reports') ? 'text-green-700' : 'text-gray-500 group-hover:text-gray-900'}`}
                     />
-                    {!isCollapsed && <span className="ml-5.5">Vegetation Health</span>}
+                    {!isCollapsed && <span className="ml-3 whitespace-nowrap">Reports</span>}
                   </Link>
                 </li>
                 <li>
                   <Link
-                    to="/water"
-                    className={`flex items-center ${isCollapsed ? 'justify-center' : 'pl-5'} w-full text-base transition duration-75 ${
-                      isActive('/water') ? 'bg-green-100 text-green-800' : 'text-gray-900 hover:bg-gray-100'
-                    } group`}
+                    to="/farm-console"
+                    className={`flex items-center px-3 py-2.5 rounded-lg ${isCollapsed ? 'justify-center' : ''} ${
+                      isActive('/farm-console') 
+                        ? 'bg-green-100 text-green-800 font-medium' 
+                        : 'text-gray-700 hover:bg-gray-100'
+                    } group transition-colors duration-150`}
                   >
                     <FontAwesomeIcon
-                      icon={faDroplet}
-                      className={`w-5 h-5 ${isActive('/water') ? 'text-green-700' : 'text-gray-500 group-hover:text-gray-900'}`}
+                      icon={faTractor}
+                      className={`w-5 h-5 ${isActive('/farm-console') ? 'text-green-700' : 'text-gray-500 group-hover:text-gray-900'}`}
                     />
-                    {!isCollapsed && <span className="ml-5.5">Irrigation</span>}
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/water"
-                    className={`flex items-center ${isCollapsed ? 'justify-center' : 'pl-5'} w-full text-base transition duration-75 ${
-                      isActive('/water') ? 'bg-green-100 text-green-800' : 'text-gray-900 hover:bg-gray-100'
-                    } group`}
-                  >
-                    <FontAwesomeIcon
-                      icon={faDroplet}
-                      className={`w-5 h-5 ${isActive('/water') ? 'text-green-700' : 'text-gray-500 group-hover:text-gray-900'}`}
-                    />
-                    {!isCollapsed && <span className="ml-5.5">Hazard Activities</span>}
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/water"
-                    className={`flex items-center ${isCollapsed ? 'justify-center' : 'pl-5'} w-full text-base transition duration-75 ${
-                      isActive('/water') ? 'bg-green-100 text-green-800' : 'text-gray-900 hover:bg-gray-100'
-                    } group`}
-                  >
-                    <FontAwesomeIcon
-                      icon={faDroplet}
-                      className={`w-5 h-5 ${isActive('/water') ? 'text-green-700' : 'text-gray-500 group-hover:text-gray-900'}`}
-                    />
-                    {!isCollapsed && <span className="ml-5.5">Monsoon info</span>}
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/soil"
-                    className={`flex items-center ${isCollapsed ? 'justify-center' : 'pl-5'} w-full text-base transition duration-75 ${
-                      isActive('/soil') ? 'bg-green-100 text-green-800' : 'text-gray-900 hover:bg-gray-100'
-                    } group`}
-                  >
-                      <FontAwesomeIcon 
-                        icon={faLayerGroup}
-                        className={`w-5 h-5 ${isActive('/soil') ? 'text-green-700' : 'text-gray-500 group-hover:text-gray-900'}`}
-                      />
-        
-                    {!isCollapsed && <span className="ml-5.5">Soil info</span>}
+                    {!isCollapsed && <span className="ml-3 whitespace-nowrap">Farm Console</span>}
                   </Link>
                 </li>
               </ul>
+            </div>
+
+            {/* Analytics Section */}
+            <div className={`px-3 py-2 ${!isCollapsed && 'mb-1'}`}>
+              {!isCollapsed && (
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Analytics
+                </h3>
+              )}
+              <ul className="mt-1">
+                <li>
+                  <button
+                    type="button"
+                    className={`flex items-center w-full px-3 py-2.5 rounded-lg text-left text-gray-700 ${
+                      isCollapsed ? 'justify-center' : ''
+                    } hover:bg-gray-100 transition-colors duration-150`}
+                    onClick={() => toggleMenu('analytics')}
+                  >
+                    <FontAwesomeIcon
+                      icon={faCloudSunRain}
+                      className="w-5 h-5 text-gray-500 group-hover:text-gray-900"
+                    />
+                    {!isCollapsed && (
+                      <>
+                        <span className="ml-3 mr-auto font-medium">Climate Analysis</span>
+                        <FontAwesomeIcon
+                          icon={expandedMenus.analytics ? faAngleDown : faAngleRight}
+                          className="w-4 h-4"
+                        />
+                      </>
+                    )}
+                  </button>
+
+                  {expandedMenus.analytics && !isCollapsed && (
+                    <ul className="mt-1 pl-7 space-y-1">
+                      <li>
+                        <Link
+                          to="/climate"
+                          className={`flex items-center px-3 py-2 rounded-md ${
+                            isActive('/climate') 
+                              ? 'bg-green-50 text-green-800' 
+                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                          } transition-colors duration-150`}
+                        >
+                          <FontAwesomeIcon
+                            icon={faCloudSunRain}
+                            className={`w-4 h-4 mr-2 ${isActive('/climate') ? 'text-green-700' : 'text-gray-500'}`}
+                          />
+                          <span>Weather Forecast</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/vegetation"
+                          className={`flex items-center px-3 py-2 rounded-md ${
+                            isActive('/vegetation') 
+                              ? 'bg-green-50 text-green-800' 
+                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                          } transition-colors duration-150`}
+                        >
+                          <FontAwesomeIcon
+                            icon={faSeedling}
+                            className={`w-4 h-4 mr-2 ${isActive('/vegetation') ? 'text-green-700' : 'text-gray-500'}`}
+                          />
+                          <span>Vegetation Health</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/water"
+                          className={`flex items-center px-3 py-2 rounded-md ${
+                            isActive('/water') 
+                              ? 'bg-green-50 text-green-800' 
+                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                          } transition-colors duration-150`}
+                        >
+                          <FontAwesomeIcon
+                            icon={faWater}
+                            className={`w-4 h-4 mr-2 ${isActive('/water') ? 'text-green-700' : 'text-gray-500'}`}
+                          />
+                          <span>Irrigation</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/hazards"
+                          className={`flex items-center px-3 py-2 rounded-md ${
+                            isActive('/hazards') 
+                              ? 'bg-green-50 text-green-800' 
+                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                          } transition-colors duration-150`}
+                        >
+                          <FontAwesomeIcon
+                            icon={faWarning}
+                            className={`w-4 h-4 mr-2 ${isActive('/hazards') ? 'text-green-700' : 'text-gray-500'}`}
+                          />
+                          <span>Hazard Activities</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/monsoon"
+                          className={`flex items-center px-3 py-2 rounded-md ${
+                            isActive('/monsoon') 
+                              ? 'bg-green-50 text-green-800' 
+                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                          } transition-colors duration-150`}
+                        >
+                          <FontAwesomeIcon
+                            icon={faCloudRain}
+                            className={`w-4 h-4 mr-2 ${isActive('/monsoon') ? 'text-green-700' : 'text-gray-500'}`}
+                          />
+                          <span>Monsoon Info</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/soil"
+                          className={`flex items-center px-3 py-2 rounded-md ${
+                            isActive('/soil') 
+                              ? 'bg-green-50 text-green-800' 
+                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                          } transition-colors duration-150`}
+                        >
+                          <FontAwesomeIcon 
+                            icon={faLayerGroup}
+                            className={`w-4 h-4 mr-2 ${isActive('/soil') ? 'text-green-700' : 'text-gray-500'}`}
+                          />
+                          <span>Soil Info</span>
+                        </Link>
+                      </li>
+                    </ul>
+                  )}
+                </li>
+              </ul>
+            </div>
+
+            {/* AI Assistant */}
+            <div className={`px-3 py-2 ${!isCollapsed && 'mb-1'}`}>
+              {!isCollapsed && (
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Tools
+                </h3>
+              )}
+              <ul className="mt-1 space-y-1">
+                <li>
+                  <Link
+                    to="/ai-assistant"
+                    className={`flex items-center px-3 py-2.5 rounded-lg ${isCollapsed ? 'justify-center' : ''} ${
+                      isActive('/ai-assistant') 
+                        ? 'bg-blue-100 text-blue-800 font-medium' 
+                        : 'text-gray-700 hover:bg-gray-100'
+                    } group transition-colors duration-150`}
+                  >
+                    <FontAwesomeIcon
+                      icon={faRobot}
+                      className={`w-5 h-5 ${isActive('/ai-assistant') ? 'text-blue-600' : 'text-gray-500 group-hover:text-gray-900'}`}
+                    />
+                    {!isCollapsed && <span className="ml-3 whitespace-nowrap">AI Assistant</span>}
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </nav>
+        </div>
+
+        {/* Bottom Section */}
+        <div className="mt-auto">
+          <div className="px-3 py-2">
+            {!isCollapsed && (
+              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                Account
+              </h3>
             )}
-          </li>
-          
-        </ul>
-
-        <div style={{display: "flex", flexDirection: "column"}} className="sidebar-bttom mt-38">
-
-          <div className="border-t border-gray-300 pt-2 pb-2">
-            <Link
-              to="/ai-assistant"
-              className={`flex items-center px-3 ${isCollapsed ? 'justify-center' : ''} ${
-                isActive('/ai-assistant') 
-                  ? 'bg-green-100 text-green-800' 
-                  : 'text-gray-900 hover:bg-gray-100'
-              } group`}
-            >
-              <FontAwesomeIcon icon={faRobot} className={`w-5 h-5 text-gray-500 transition ${isActive('/ai-assistant') ? 'text-gray-900' : 'group-hover:text-gray-900'}`} />
-              {!isCollapsed && <span className="ml-3 whitespace-nowrap">AI Assistant</span>}
-            </Link>
-          </div>
-
-          <div className="border-t border-gray-300 pt-2 pb-2">
-            <Link
-              to="/profile"
-              className={`flex items-center px-3 ${isCollapsed ? 'justify-center' : ''} text-gray-900 hover:bg-gray-50 hover:text-gray-900 group transition-colors`}
-            >
-              <FontAwesomeIcon icon={faUser} className="w-5 h-5 text-gray-500 transition group-hover:text-gray-900" />
-              {!isCollapsed && <span className="ml-3">Admin</span>}
-              {/* <div className="text-xs text-gray-500">admin@example.com</div> */}
-            </Link>
-          </div>
-          <div className="border-t border-gray-300 pt-2 pb-2">
-            <Link
-              to="/profile"
-              className={`flex items-center px-3 ${isCollapsed ? 'justify-center' : ''} text-gray-900 hover:bg-gray-50 hover:text-gray-900 group transition-colors`}
-            >
-              <FontAwesomeIcon icon={faCog} className="w-5 h-5 text-gray-500 transition group-hover:text-gray-900" />
-              {!isCollapsed && <span className="ml-3">Settings</span>}
-            </Link>
-          </div>
-
-          <div className="border-t border-gray-300 pt-2 pb-2">
-            <Link
-              to="/logout"
-              className={`flex items-center px-3 ${isCollapsed ? 'justify-center' : ''} text-gray-900 hover:bg-red-50 hover:text-red-700 group transition-colors`}
-            >
-              <FontAwesomeIcon icon={faArrowRightFromBracket} className="w-5 h-5 text-gray-500 transition group-hover:text-red-900"></FontAwesomeIcon>
-              {!isCollapsed && <span className="ml-3">Logout</span>}
-            </Link>
+            <ul className="space-y-1">
+              <li>
+                <Link
+                  to="/profile"
+                  className={`flex items-center px-3 py-2.5 rounded-lg ${isCollapsed ? 'justify-center' : ''} ${
+                    isActive('/profile') 
+                      ? 'bg-gray-100 text-gray-800' 
+                      : 'text-gray-700 hover:bg-gray-100'
+                  } group transition-colors duration-150`}
+                >
+                  <FontAwesomeIcon
+                    icon={faUser}
+                    className={`w-5 h-5 ${isActive('/profile') ? 'text-gray-700' : 'text-gray-500'} group-hover:text-gray-700`}
+                  />
+                  {!isCollapsed && <span className="ml-3 whitespace-nowrap">Admin</span>}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/settings"
+                  className={`flex items-center px-3 py-2.5 rounded-lg ${isCollapsed ? 'justify-center' : ''} ${
+                    isActive('/settings') 
+                      ? 'bg-gray-100 text-gray-800' 
+                      : 'text-gray-700 hover:bg-gray-100'
+                  } group transition-colors duration-150`}
+                >
+                  <FontAwesomeIcon
+                    icon={faCog}
+                    className={`w-5 h-5 ${isActive('/settings') ? 'text-gray-700' : 'text-gray-500'} group-hover:text-gray-700`}
+                  />
+                  {!isCollapsed && <span className="ml-3 whitespace-nowrap">Settings</span>}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/logout"
+                  className="flex items-center px-3 py-2.5 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-700 transition-colors duration-150"
+                >
+                  <FontAwesomeIcon
+                    icon={faArrowRightFromBracket}
+                    className={`w-5 h-5 ${isCollapsed ? 'mx-auto' : 'text-gray-500'} group-hover:text-red-600`}
+                  />
+                  {!isCollapsed && <span className="ml-3 whitespace-nowrap">Logout</span>}
+                </Link>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
