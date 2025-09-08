@@ -22,8 +22,33 @@ const WaterIrrigationAnalysis = ({ dateRange, loading, setLoading }) => {
     recommendations: []
   });
   
+  // New state for water indices from CSV files
+  const [waterIndices, setWaterIndices] = useState({
+    ndwi: [],
+    ndmi: [],
+    awei: [],
+    sarwi: [],
+    ewi: [],
+    loading: true
+  });
+
+  // Key observations and nutrient content
+  const [keyObservations, setKeyObservations] = useState({
+    health: { value: 85, status: 'Good' },
+    stress: { value: 12, status: 'Low' },
+    aging: { value: 28, status: 'Normal' },
+    chlorophyll: { value: 75, status: 'Optimal' },
+    nutrients: {
+      nitrogen: { value: 42, status: 'Adequate' },
+      phosphorus: { value: 28, status: 'Low' },
+      potassium: { value: 165, status: 'High' },
+      magnesium: { value: 52, status: 'Adequate' }
+    }
+  });
+  
   useEffect(() => {
     loadWaterData();
+    loadWaterIndicesFromCsv();
   }, [selectedField, selectedLocation, dateRange]);
   
   const loadWaterData = async () => {
@@ -39,6 +64,51 @@ const WaterIrrigationAnalysis = ({ dateRange, loading, setLoading }) => {
       console.error('Error loading water data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+  
+  // Function to load water indices from CSV files
+  const loadWaterIndicesFromCsv = async () => {
+    setWaterIndices(prev => ({ ...prev, loading: true }));
+    
+    try {
+      // Helper function to fetch and parse CSV
+      const fetchCsv = async (filename) => {
+        const response = await fetch(`/local_csv/${filename}`);
+        const text = await response.text();
+        return Papa.parse(text, { header: true, skipEmptyLines: true }).data;
+      };
+      
+      // Load all CSV files in parallel
+      const [ndwiData, ndmiData, aweiData, sarwiData, ewiData] = await Promise.all([
+        fetchCsv('ndwi.csv'),
+        fetchCsv('ndmi.csv'),
+        fetchCsv('awei.csv'),
+        fetchCsv('sarwi.csv'),
+        fetchCsv('ewi.csv')
+      ]);
+      
+      // Process each dataset to extract date and values
+      const processData = (data, valueField) => {
+        return data.map(item => ({
+          date: item.date,
+          value: parseFloat(item[valueField])
+        })).filter(item => !isNaN(item.value))
+         .sort((a, b) => new Date(a.date) - new Date(b.date));
+      };
+      
+      setWaterIndices({
+        ndwi: processData(ndwiData, 'ndwi'),
+        ndmi: processData(ndmiData, 'ndmi'),
+        awei: processData(aweiData, 'awei'),
+        sarwi: processData(sarwiData, 'sarwi'),
+        ewi: processData(ewiData, 'ewi'),
+        loading: false
+      });
+      
+    } catch (error) {
+      console.error('Error loading water indices from CSV:', error);
+      setWaterIndices(prev => ({ ...prev, loading: false }));
     }
   };
   
@@ -93,6 +163,138 @@ const WaterIrrigationAnalysis = ({ dateRange, loading, setLoading }) => {
         borderColor: 'rgb(54, 162, 235)',
         tension: 0.3,
         pointBackgroundColor: 'rgb(54, 162, 235)',
+      }
+    ]
+  };
+  
+  // Generate chart data for water indices
+  const formatDate = (dateString) => {
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
+    } catch (e) {
+      console.error('Invalid date:', dateString);
+      return '';
+    }
+  };
+  
+  const getWaterIndicesChartData = (indices) => {
+    const colorMap = {
+      ndwi: {
+        border: 'rgb(54, 162, 235)',
+        background: 'rgba(54, 162, 235, 0.2)'
+      },
+      ndmi: {
+        border: 'rgb(75, 192, 192)',
+        background: 'rgba(75, 192, 192, 0.2)'
+      },
+      awei: {
+        border: 'rgb(153, 102, 255)',
+        background: 'rgba(153, 102, 255, 0.2)'
+      },
+      sarwi: {
+        border: 'rgb(255, 159, 64)',
+        background: 'rgba(255, 159, 64, 0.2)'
+      },
+      ewi: {
+        border: 'rgb(255, 99, 132)',
+        background: 'rgba(255, 99, 132, 0.2)'
+      }
+    };
+    
+    // Find all dates from all indices
+    const allDates = new Set();
+    Object.values(indices)
+      .filter(dataset => Array.isArray(dataset))
+      .forEach(dataset => {
+        dataset.forEach(item => {
+          if (item.date) allDates.add(item.date);
+        });
+      });
+    
+    const sortedDates = [...allDates].sort((a, b) => new Date(a) - new Date(b));
+    const labels = sortedDates.map(date => formatDate(date));
+    
+    // Create datasets for each index
+    const datasets = [];
+    
+    Object.entries(indices)
+      .filter(([key]) => key !== 'loading' && Array.isArray(indices[key]) && indices[key].length > 0)
+      .forEach(([key, data]) => {
+        // Create a map of date to value for quick lookup
+        const dateValueMap = {};
+        data.forEach(item => {
+          dateValueMap[item.date] = item.value;
+        });
+        
+        // For each date, get the value or null
+        const values = sortedDates.map(date => dateValueMap[date] || null);
+        
+        let label;
+        switch(key) {
+          case 'ndwi':
+            label = 'NDWI - Normalized Difference Water Index';
+            break;
+          case 'ndmi':
+            label = 'NDMI - Normalized Difference Moisture Index';
+            break;
+          case 'awei':
+            label = 'AWEI - Automated Water Extraction Index';
+            break;
+          case 'sarwi':
+            label = 'SARWI - Modified Normalized Difference';
+            break;
+          case 'ewi':
+            label = 'EWI - Enhanced Wetness Index';
+            break;
+          default:
+            label = key.toUpperCase();
+        }
+        
+        datasets.push({
+          label: label,
+          data: values,
+          borderColor: colorMap[key].border,
+          backgroundColor: colorMap[key].background,
+          borderWidth: 2,
+          fill: false,
+          tension: 0.4,
+          pointRadius: 3
+        });
+      });
+    
+    return {
+      labels,
+      datasets
+    };
+  };
+  
+  const waterIndicesChartData = getWaterIndicesChartData(waterIndices);
+  
+  // Generate chart data for nutrients
+  const nutrientsChartData = {
+    labels: ['Nitrogen', 'Phosphorus', 'Potassium', 'Magnesium'],
+    datasets: [
+      {
+        label: 'Nutrient Content',
+        data: [
+          keyObservations.nutrients.nitrogen.value,
+          keyObservations.nutrients.phosphorus.value,
+          keyObservations.nutrients.potassium.value,
+          keyObservations.nutrients.magnesium.value
+        ],
+        backgroundColor: [
+          'rgba(75, 192, 192, 0.6)',
+          'rgba(255, 159, 64, 0.6)',
+          'rgba(54, 162, 235, 0.6)',
+          'rgba(153, 102, 255, 0.6)'
+        ],
+        borderColor: [
+          'rgb(75, 192, 192)',
+          'rgb(255, 159, 64)',
+          'rgb(54, 162, 235)',
+          'rgb(153, 102, 255)'
+        ],
+        borderWidth: 1
       }
     ]
   };
