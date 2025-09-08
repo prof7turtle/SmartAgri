@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMap, faArrowLeft, faEdit, faTrash, faSpinner, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { faMap, faArrowLeft, faEdit, faTrash, faSpinner, faExclamationTriangle, faSeedling } from '@fortawesome/free-solid-svg-icons';
 import { API_URLS } from '../config';
 import '../components/fields/Fields.css';
 
@@ -243,6 +243,10 @@ const FieldDetail = () => {
                   <div>
                     <h3 className="text-sm text-gray-500">Field Size</h3>
                     <p className="font-medium">{calculateFieldArea(field.coordinates).toFixed(2)} hectares</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm text-gray-500">Crop</h3>
+                    <p className="font-medium">{field.crop || 'Not specified'}</p>
                   </div>
                 </div>
               </div>

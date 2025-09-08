@@ -103,155 +103,106 @@ export const fetchFieldData = async (fieldId) => {
       throw new Error('Invalid response format');
     }
     
-    return data.field;
-  } catch (error) {
-    console.warn('API not available, using fallback field data:', error.message);
+    // Calculate field size in acres from coordinates
+    const fieldSize = calculateFieldArea(data.field.coordinates);
     
-    // Return mock data for specific field when API is not available
-    const mockFields = [
-      {
-        id: 1,
-        name: "North Field",
-        crop: "Wheat",
-        area: 5.2,
-        status: "Active",
-        lastIrrigated: "2025-09-07",
-        soilMoisture: 68,
-        location: "North Farm Area",
-        coordinates: [
-          { lat: 28.6139, lng: 77.2090 },
-          { lat: 28.6149, lng: 77.2090 },
-          { lat: 28.6149, lng: 77.2110 },
-          { lat: 28.6139, lng: 77.2110 }
-        ],
-        sensorData: {
-          temperature: 28,
-          humidity: 65,
-          ph: 6.8,
-          nutrients: { nitrogen: 45, phosphorus: 32, potassium: 67 }
-        }
-      },
-      {
-        id: 2,
-        name: "South Field",
-        crop: "Rice",
-        area: 3.8,
-        status: "Active",
-        lastIrrigated: "2025-09-06",
-        soilMoisture: 72,
-        location: "South Farm Area",
-        coordinates: [
-          { lat: 28.6120, lng: 77.2090 },
-          { lat: 28.6130, lng: 77.2090 },
-          { lat: 28.6130, lng: 77.2110 },
-          { lat: 28.6120, lng: 77.2110 }
-        ],
-        sensorData: {
-          temperature: 29,
-          humidity: 70,
-          ph: 7.2,
-          nutrients: { nitrogen: 52, phosphorus: 28, potassium: 58 }
-        }
-      }
-    ];
+    // Add additional properties needed for the dashboard
+    // Handle the field with crop data
+    const crop = data.field.crop || 'Not specified';
     
-    // Find and return the specific field, or return the first one if not found
-    const field = mockFields.find(f => f.id === parseInt(fieldId)) || mockFields[0];
-    return field;
-  }
-};
-
-// Function to create a new field
-export const createField = async (fieldData) => {
-  try {
-    const response = await fetch(API_URLS.FIELDS, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(fieldData),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error creating field: ${response.status}`);
-    }
-
-    const data = await response.json();
-    
-    if (!data.success) {
-      throw new Error(data.message || 'Failed to create field');
-    }
-
-    return data.field;
-  } catch (error) {
-    console.warn('API not available for field creation:', error.message);
-    
-    // Return mock success response when API is not available
     return {
-      id: Date.now(),
-      ...fieldData,
-      status: 'Active',
-      createdAt: new Date().toISOString()
+      ...data.field,
+      size: fieldSize.toFixed(2), // converted to acres
+      crops: [crop], // Use the crop from the field data
+      mainCrop: crop, // Add main crop directly for easy access
+      soilType: 'Clay Loam',
+      plantingDate: '2025-06-10',
+      ndviHistory: [
+        { date: '2025-07-15', value: 0.65 },
+        { date: '2025-07-22', value: 0.68 },
+        { date: '2025-07-29', value: 0.72 },
+        { date: '2025-08-05', value: 0.75 },
+        { date: '2025-08-12', value: 0.78 },
+      ]
     };
-  }
-};
-
-// Function to update a field
-export const updateField = async (fieldId, fieldData) => {
-  try {
-    const response = await fetch(`${API_URLS.FIELDS}/${fieldId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(fieldData),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error updating field: ${response.status}`);
-    }
-
-    const data = await response.json();
-    
-    if (!data.success) {
-      throw new Error(data.message || 'Failed to update field');
-    }
-
-    return data.field;
   } catch (error) {
     console.warn('API not available for field update:', error.message);
     
     // Return mock success response when API is not available
     return {
       id: fieldId,
-      ...fieldData,
-      updatedAt: new Date().toISOString()
+      name: `Field ${fieldId}`,
+      size: 20, // acres
+      location: 'Unknown',
+      crop: 'Wheat', // Default crop
+      crops: ['Wheat'],
+      mainCrop: 'Wheat',
+      soilType: 'Clay Loam',
+      plantingDate: '2025-06-10',
+      ndviHistory: [
+        { date: '2025-07-15', value: 0.65 },
+        { date: '2025-07-22', value: 0.68 },
+        { date: '2025-07-29', value: 0.72 },
+        { date: '2025-08-05', value: 0.75 },
+        { date: '2025-08-12', value: 0.78 },
+      ]
     };
   }
 };
 
-// Function to delete a field
-export const deleteField = async (fieldId) => {
+// Function to update manipal.json with coordinates from a selected field
+export const updateManipalCoordinates = async (fieldId) => {
   try {
-    const response = await fetch(`${API_URLS.FIELDS}/${fieldId}`, {
-      method: 'DELETE',
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error deleting field: ${response.status}`);
+    if (!fieldId) {
+      console.error('Field ID is required to update manipal.json');
+      return { success: false, message: 'Field ID is required' };
     }
-
+    
+    const response = await fetch(API_URLS.UPDATE_MANIPAL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ fieldId }),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error updating manipal.json: ${response.status}`);
+    }
+    
     const data = await response.json();
     
     if (!data.success) {
-      throw new Error(data.message || 'Failed to delete field');
+      throw new Error(data.message || 'Failed to update manipal.json');
     }
-
-    return true;
-  } catch (error) {
-    console.warn('API not available for field deletion:', error.message);
     
-    // Return mock success response when API is not available
-    return true;
+    console.log('manipal.json updated successfully with coordinates for field:', fieldId);
+    return data;
+  } catch (error) {
+    console.error('Error updating manipal.json:', error);
+    return { success: false, message: error.message };
   }
+};
+
+// Helper function to calculate field area in acres from coordinates
+function calculateFieldArea(coordinates) {
+  if (!coordinates || coordinates.length < 3) return 0;
+
+  // Implementation of the Shoelace formula to calculate polygon area
+  let area = 0;
+  for (let i = 0; i < coordinates.length; i++) {
+    const j = (i + 1) % coordinates.length;
+    area += coordinates[i].lat * coordinates[j].lng;
+    area -= coordinates[j].lat * coordinates[i].lng;
+  }
+
+  area = Math.abs(area) / 2;
+  
+  // Convert square degrees to hectares
+  const degreeToMeter = 111319.9; // At equator, varies by latitude
+  const squareMetersToHectares = 0.0001;
+  const hectaresToAcres = 2.47105;
+  
+  return area * Math.pow(degreeToMeter, 2) * squareMetersToHectares * hectaresToAcres;
 };

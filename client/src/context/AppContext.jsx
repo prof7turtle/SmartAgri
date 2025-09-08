@@ -1,8 +1,24 @@
 import { createContext, useState, useContext, useEffect } from 'react';
-import { fetchFields } from '../services/dataService';
+import { fetchFields, updateManipalCoordinates } from '../services/dataService';
 
-// Create the context
-const AppContext = createContext();
+// Create the context with default values
+const AppContext = createContext({
+  selectedField: '',
+  setSelectedField: () => {},
+  selectedLocation: '',
+  setSelectedLocation: () => {},
+  fields: [],
+  loading: false,
+  addField: () => {},
+  refreshFields: async () => {},
+  analyticsData: {
+    weather: {},
+    vegetation: {},
+    soil: {},
+    water: {}
+  },
+  updateAnalyticsData: () => {}
+});
 
 // Create a custom hook to use the context
 export const useAppContext = () => useContext(AppContext);
@@ -35,7 +51,8 @@ export const AppProvider = ({ children }) => {
         
         // Select the first field by default if available
         if (fieldData.length > 0 && !selectedField) {
-          setSelectedField(fieldData[0].id);
+          // Using the custom handler to set the field and update manipal.json
+          handleSetSelectedField(fieldData[0].id);
           if (fieldData[0].location) {
             setSelectedLocation(fieldData[0].location);
           }
@@ -76,10 +93,28 @@ export const AppProvider = ({ children }) => {
     }
   };
   
+  // Custom setter for selectedField that also updates manipal.json
+  const handleSetSelectedField = (fieldId) => {
+    setSelectedField(fieldId);
+    
+    // Update manipal.json with the coordinates of the selected field
+    if (fieldId) {
+      updateManipalCoordinates(fieldId)
+        .then(result => {
+          if (!result.success) {
+            console.warn('Failed to update manipal.json:', result.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error in updating manipal.json:', error);
+        });
+    }
+  };
+
   // Values to be provided to consumers
   const value = {
     selectedField,
-    setSelectedField,
+    setSelectedField: handleSetSelectedField, // Use our custom setter
     selectedLocation,
     setSelectedLocation,
     fields,

@@ -12,7 +12,9 @@ const CLIENT_URL = isDevelopment
   : window.location.origin;
 
 export const API_URLS = {
-  FIELDS: `${API_BASE_URL}/api/fields`
+  FIELDS: `${API_BASE_URL}/api/fields`,
+  SOIL_DATA: `${API_BASE_URL}/api/soil`,
+  UPDATE_MANIPAL: `${API_BASE_URL}/api/update-manipal`
 };
 
 export default {
