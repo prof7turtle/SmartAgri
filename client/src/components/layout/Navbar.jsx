@@ -132,7 +132,7 @@ const Navbar = () => {
               </button>
               
               {/* Field Selection */}
-              <div className="relative min-w-[160px]">
+              {/* <div className="relative min-w-[160px]">
                 <select
                   name="Select Field"
                   id="selectField"
@@ -149,7 +149,7 @@ const Navbar = () => {
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">
                   <FontAwesomeIcon icon={faChevronDown} className="w-4 h-4" />
                 </div>
-              </div>
+              </div> */}
               
               {/* Navigation Buttons */}
               {/* <button 

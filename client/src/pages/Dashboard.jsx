@@ -134,7 +134,7 @@ const Dashboard = () => {
               </h3>
               <div className="mt-2 sm:mt-0 flex items-center gap-4">
                 {/* Field Selector */}
-                <div className="flex items-center">
+                {/* <div className="flex items-center">
                   <label htmlFor="field-select" className="mr-2 text-sm text-gray-500">Select Field:</label>
                   <select
                     id="field-select"
@@ -149,7 +149,7 @@ const Dashboard = () => {
                       </option>
                     ))}
                   </select>
-                </div>
+                </div> */}
                 
                 <div className="flex items-center gap-2">
                   <span className="text-sm bg-green-100 text-green-800 py-1 px-3 rounded-full font-medium">

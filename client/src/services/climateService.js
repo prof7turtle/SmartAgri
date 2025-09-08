@@ -242,23 +242,109 @@ export const fetchSoilData = (fieldId, location, dateRange) => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       try {
+        // Randomize but ensure values stay in realistic ranges
+        const phValue = parseFloat((6.5 + Math.random() * 1.0 - 0.5).toFixed(1));
+        const nitrogenValue = parseFloat((Math.random() * 20 + 40).toFixed(1));
+        const phosphorusValue = parseFloat((Math.random() * 15 + 25).toFixed(1));
+        const potassiumValue = parseFloat((Math.random() * 50 + 150).toFixed(1));
+        const organicMatterValue = parseFloat((Math.random() * 1.5 + 2.0).toFixed(1));
+
+        // More comprehensive soil data
         const soilData = {
           soilType: 'Clay Loam',
-          ph: parseFloat((6.5 + Math.random() * 1.0).toFixed(1)),
-          nitrogen: parseFloat((Math.random() * 20 + 40).toFixed(1)),
-          phosphorus: parseFloat((Math.random() * 15 + 25).toFixed(1)),
-          potassium: parseFloat((Math.random() * 50 + 150).toFixed(1)),
-          organicMatter: parseFloat((Math.random() * 1.5 + 2.0).toFixed(1)),
+          ph: phValue,
+          // Primary macronutrients (NPK)
+          nitrogen: nitrogenValue,
+          phosphorus: phosphorusValue,
+          potassium: potassiumValue,
+          // Secondary macronutrients
+          calcium: parseFloat((Math.random() * 500 + 1000).toFixed(1)),
+          magnesium: parseFloat((Math.random() * 20 + 45).toFixed(1)),
+          sulfur: parseFloat((Math.random() * 10 + 10).toFixed(1)),
+          // Micronutrients
+          zinc: parseFloat((Math.random() * 2 + 1).toFixed(1)),
+          iron: parseFloat((Math.random() * 10 + 15).toFixed(1)),
+          manganese: parseFloat((Math.random() * 5 + 5).toFixed(1)),
+          copper: parseFloat((Math.random() * 1 + 1).toFixed(1)),
+          boron: parseFloat((Math.random() * 0.5 + 0.5).toFixed(2)),
+          molybdenum: parseFloat((Math.random() * 0.1 + 0.1).toFixed(2)),
+          // Physical properties
+          organicMatter: organicMatterValue,
+          cec: parseFloat((Math.random() * 5 + 12).toFixed(1)), // Cation Exchange Capacity
+          waterCapacity: parseFloat((Math.random() * 0.1 + 0.15).toFixed(2)),
+          soilTemperature: parseFloat((Math.random() * 5 + 20).toFixed(1)),
+          soilCompaction: parseFloat((Math.random() * 0.2 + 1.1).toFixed(1)),
+          // Soil composition
+          sandPercentage: 35,
+          siltPercentage: 40, 
+          clayPercentage: 25,
+          // Historical data (would be more comprehensive in a real app)
+          history: [
+            {
+              date: '2025-02-15',
+              ph: parseFloat((phValue - 0.2).toFixed(1)),
+              organicMatter: parseFloat((organicMatterValue - 0.3).toFixed(1)),
+              nitrogen: parseFloat((nitrogenValue - 5).toFixed(1))
+            },
+            {
+              date: '2024-08-10',
+              ph: parseFloat((phValue - 0.4).toFixed(1)),
+              organicMatter: parseFloat((organicMatterValue - 0.6).toFixed(1)),
+              nitrogen: parseFloat((nitrogenValue - 8).toFixed(1))
+            }
+          ],
+          // Recommendations based on soil test
           recommendations: [
             {
               nutrient: 'Nitrogen',
-              current: 'Moderate',
-              recommendation: 'Apply 40kg/ha before next planting'
+              current: `${nitrogenValue} kg/ha`,
+              recommendation: `Apply ${Math.max(0, Math.round(60 - nitrogenValue))} kg/ha of nitrogen-rich fertilizer before next planting`,
+              fertilizers: ['Urea (46-0-0)', 'Ammonium Nitrate (34-0-0)']
             },
             {
               nutrient: 'Phosphorus',
-              current: 'Low',
-              recommendation: 'Apply 30kg/ha of phosphatic fertilizer'
+              current: `${phosphorusValue} kg/ha`,
+              recommendation: `Apply ${Math.max(0, Math.round(40 - phosphorusValue))} kg/ha of phosphatic fertilizer to improve root development`,
+              fertilizers: ['Triple Superphosphate (0-46-0)', 'DAP (18-46-0)']
+            },
+            {
+              nutrient: 'Potassium',
+              current: `${potassiumValue} kg/ha`,
+              recommendation: `Apply ${Math.max(0, Math.round(200 - potassiumValue))} kg/ha of potassium fertilizer for drought resistance`,
+              fertilizers: ['Potassium Chloride (0-0-60)', 'Potassium Sulfate (0-0-50)']
+            }
+          ],
+          // pH management
+          phManagement: phValue < 5.5 ? {
+            action: 'Increase pH',
+            amount: '50 kg/ha',
+            material: 'agricultural lime',
+            benefit: 'Improve nutrient availability and microbial activity'
+          } : phValue > 7.5 ? {
+            action: 'Decrease pH',
+            amount: '30 kg/ha',
+            material: 'elemental sulfur',
+            benefit: 'Improve nutrient availability, especially phosphorus and micronutrients'
+          } : null,
+          // Soil management practices
+          managementPractices: [
+            {
+              practice: 'Apply Organic Matter',
+              description: 'Add compost or manure to improve soil structure and water retention',
+              priority: 'high',
+              schedule: 'Fall 2025'
+            },
+            {
+              practice: 'Implement Crop Rotation',
+              description: 'Alternate different crop families to prevent nutrient depletion',
+              priority: 'medium',
+              schedule: 'Next planting season'
+            },
+            {
+              practice: 'Use Cover Crops',
+              description: 'Plant legumes or grasses during off-seasons to prevent erosion',
+              priority: 'high',
+              schedule: 'After harvest'
             }
           ]
         };
