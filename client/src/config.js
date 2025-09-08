@@ -13,7 +13,8 @@ const CLIENT_URL = isDevelopment
 
 export const API_URLS = {
   FIELDS: `${API_BASE_URL}/api/fields`,
-  SOIL_DATA: `${API_BASE_URL}/api/soil`
+  SOIL_DATA: `${API_BASE_URL}/api/soil`,
+  UPDATE_MANIPAL: `${API_BASE_URL}/api/update-manipal`
 };
 
 export default {

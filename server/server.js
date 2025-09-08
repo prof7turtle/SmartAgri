@@ -166,6 +166,70 @@ app.delete('/api/fields/:id', (req, res) => {
   }
 });
 
+// API endpoint to update manipal.json with coordinates from a selected field
+app.post('/api/update-manipal', (req, res) => {
+  try {
+    const { fieldId } = req.body;
+    
+    if (!fieldId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Field ID is required'
+      });
+    }
+    
+    // Find the field file
+    const files = fs.readdirSync(fieldCoordsDir);
+    const fieldFile = files.find(file => file.includes(fieldId) && file.endsWith('.json'));
+    
+    if (!fieldFile) {
+      return res.status(404).json({
+        success: false,
+        message: 'Field not found'
+      });
+    }
+    
+    // Read the field data from the file
+    const filePath = path.join(fieldCoordsDir, fieldFile);
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+    const fieldData = JSON.parse(fileContent);
+    
+    if (!fieldData.coordinates || fieldData.coordinates.length < 3) {
+      return res.status(400).json({
+        success: false,
+        message: 'Field has invalid or insufficient coordinates'
+      });
+    }
+    
+    // Transform the coordinates to the required format for manipal.json
+    // Format: { "1": [longitude, latitude], "2": [longitude, latitude], ... }
+    const manipalCoordinates = {};
+    
+    fieldData.coordinates.forEach((coord, index) => {
+      // The field has coordinates in { lat, lng } format
+      // We need to convert to [longitude, latitude]
+      manipalCoordinates[(index + 1).toString()] = [coord.lng, coord.lat];
+    });
+    
+    // Write to manipal.json in the field_corrdinates folder
+    const manipalPath = path.join(__dirname, 'field_corrdinates', 'manipal.json');
+    fs.writeFileSync(manipalPath, JSON.stringify(manipalCoordinates, null, 2));
+    
+    return res.status(200).json({
+      success: true,
+      message: 'manipal.json updated successfully',
+      coordinates: manipalCoordinates
+    });
+    
+  } catch (error) {
+    console.error('Error updating manipal.json:', error);
+    return res.status(500).json({
+      success: false,
+      message: `Server error while updating manipal.json: ${error.message}`
+    });
+  }
+});
+
 // API endpoint to get soil and land data for a field
 app.get('/api/soil/:fieldId', (req, res) => {
   try {

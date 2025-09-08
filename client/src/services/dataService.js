@@ -136,6 +136,41 @@ export const fetchFieldData = async (fieldId) => {
   }
 };
 
+// Function to update manipal.json with coordinates from a selected field
+export const updateManipalCoordinates = async (fieldId) => {
+  try {
+    if (!fieldId) {
+      console.error('Field ID is required to update manipal.json');
+      return { success: false, message: 'Field ID is required' };
+    }
+    
+    const response = await fetch(API_URLS.UPDATE_MANIPAL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ fieldId }),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error updating manipal.json: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    if (!data.success) {
+      throw new Error(data.message || 'Failed to update manipal.json');
+    }
+    
+    console.log('manipal.json updated successfully with coordinates for field:', fieldId);
+    return data;
+  } catch (error) {
+    console.error('Error updating manipal.json:', error);
+    return { success: false, message: error.message };
+  }
+};
+
 // Helper function to calculate field area in acres from coordinates
 function calculateFieldArea(coordinates) {
   if (!coordinates || coordinates.length < 3) return 0;
