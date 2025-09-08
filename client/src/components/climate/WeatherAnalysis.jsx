@@ -15,7 +15,8 @@ import {
   faCloud,
   faThermometerHalf,
   faRainbow,
-  faTriangleExclamation
+  faTriangleExclamation,
+  faLeaf
 } from '@fortawesome/free-solid-svg-icons';
 import { Line, Bar } from 'react-chartjs-2';
 import { useAppContext } from '../../context/AppContext';
