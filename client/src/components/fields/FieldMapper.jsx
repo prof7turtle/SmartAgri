@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMap, faSave, faEraser, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { API_URLS } from '../../config';
 import './FieldMapper.css';
 
 const FieldMapper = () => {
@@ -209,8 +210,10 @@ const FieldMapper = () => {
         createdAt: new Date().toISOString()
       };
       
+      console.log('Sending field data to server:', fieldData);
+      
       // Save to server
-      const response = await fetch('/api/fields', {
+      const response = await fetch(API_URLS.FIELDS, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -218,11 +221,21 @@ const FieldMapper = () => {
         body: JSON.stringify(fieldData),
       });
       
-      if (!response.ok) {
-        throw new Error('Failed to save field data');
+      const responseText = await response.text();
+      console.log('Server response:', response.status, responseText);
+      
+      let result;
+      try {
+        // Try to parse as JSON
+        result = JSON.parse(responseText);
+      } catch (e) {
+        console.error('Failed to parse response as JSON:', e);
+        result = { success: false, message: 'Invalid server response' };
       }
       
-      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to save field data');
+      }
       
       setMessage({
         show: true,

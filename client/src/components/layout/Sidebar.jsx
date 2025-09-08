@@ -78,7 +78,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
   return (
     <aside 
       id="sidebar"
-      className={`fixed top-0 left-0 z-40 h-screen pt-14 transition-all duration-300 ease-in-out bg-gradient-to-b from-green to-gray-50 border-r border-green-200 shadow-sm ${
+      className={`fixed top-0 left-0 z-40 h-screen pt-14 transition-all duration-300 ease-in-out bg-gradient-to-b from-green to-gray-50 border-r border-gray-200 shadow-sm ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
       } ${isMobile ? 'w-72' : ''} ${!isMobile && isCollapsed ? 'md:w-20' : 'md:w-64'}` }
       aria-label="Sidebar"
