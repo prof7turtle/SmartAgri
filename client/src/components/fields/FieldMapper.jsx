@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMap, faSave, faEraser, faExclamationTriangle, faSeedling } from '@fortawesome/free-solid-svg-icons';
 import { API_URLS } from '../../config';
+import googleMapsLoader from '../../utils/googleMapsLoader';
 import './FieldMapper.css';
 
 const FieldMapper = () => {
@@ -26,71 +27,34 @@ const FieldMapper = () => {
 
   // Initialize the Google Maps and drawing tools
   useEffect(() => {
-    const loadGoogleMapsScript = () => {
-      // Check if Google Maps is already loaded
-      if (window.google && window.google.maps) {
+    const loadMaps = async () => {
+      try {
+        await googleMapsLoader.loadGoogleMaps(['drawing', 'geometry']);
         initMap();
-        return;
-      }
-
-      // Check if script is already being loaded
-      const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
-      if (existingScript) {
-        // If script exists, wait for it to load
-        if (window.initMapCallback) {
-          const originalCallback = window.initMapCallback;
-          window.initMapCallback = () => {
-            originalCallback();
-            initMap();
-          };
-        } else {
-          // Wait for script to load
-          existingScript.addEventListener('load', () => {
-            if (window.google && window.google.maps) {
-              initMap();
-            }
-          });
-        }
-        return;
-      }
-
-      const apiKey = "AIzaSyA3vUl0jnyrAi_awYheUAYjFNDKCUaDpeU";
-      const script = document.createElement('script');
-      // Use geometry library instead of deprecated drawing library
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=geometry&loading=async&callback=initMapCallback`;
-      script.async = true;
-      script.defer = true;
-      
-      window.initMapCallback = () => {
-        initMap();
-        delete window.initMapCallback;
-      };
-      
-      script.onerror = () => {
+      } catch (error) {
         setMessage({
           show: true,
           text: "Failed to load Google Maps. Please check your internet connection.",
           type: 'error'
         });
-      };
-      
-      document.head.appendChild(script);
-      
-      return () => {
-        if (script.parentNode) {
-          script.parentNode.removeChild(script);
-        }
-        if (window.initMapCallback) {
-          delete window.initMapCallback;
-        }
-      };
+      }
     };
 
-    loadGoogleMapsScript();
+    loadMaps();
   }, []);
 
   const initMap = () => {
     if (!mapRef.current) return;
+    
+    // Check if Google Maps API is properly loaded
+    if (!window.google || !window.google.maps) {
+      setMessage({
+        show: true,
+        text: "Google Maps API not loaded properly. Please refresh the page.",
+        type: 'error'
+      });
+      return;
+    }
     
     const mapInstance = new window.google.maps.Map(mapRef.current, {
       center: { lat: 20.5937, lng: 78.9629 }, // Center on India
@@ -100,6 +64,16 @@ const FieldMapper = () => {
       streetViewControl: false,
       fullscreenControl: false
     });
+    
+    // Check if drawing library is loaded
+    if (!window.google.maps.drawing || !window.google.maps.drawing.DrawingManager) {
+      setMessage({
+        show: true,
+        text: "Google Maps Drawing library not loaded. Please refresh the page.",
+        type: 'error'
+      });
+      return;
+    }
     
     const drawingManagerInstance = new window.google.maps.drawing.DrawingManager({
       drawingMode: window.google.maps.drawing.OverlayType.POLYGON,
