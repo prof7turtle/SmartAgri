@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMap, faArrowLeft, faEdit, faTrash, faSpinner, faExclamationTriangle, faSeedling } from '@fortawesome/free-solid-svg-icons';
 import { API_URLS } from '../config';
+import googleMapsLoader from '../utils/googleMapsLoader';
 import '../components/fields/Fields.css';
 
 const FieldDetail = () => {
@@ -47,63 +48,16 @@ const FieldDetail = () => {
   useEffect(() => {
     if (!field || !field.coordinates || field.coordinates.length < 3) return;
 
-    const loadGoogleMapsScript = () => {
-      // Check if Google Maps is already loaded
-      if (window.google && window.google.maps) {
+    const loadMaps = async () => {
+      try {
+        await googleMapsLoader.loadGoogleMaps(['geometry']);
         initMap();
-        return;
-      }
-
-      // Check if script is already being loaded
-      const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
-      if (existingScript) {
-        // If script exists, wait for it to load
-        if (window.initMapCallback) {
-          const originalCallback = window.initMapCallback;
-          window.initMapCallback = () => {
-            originalCallback();
-            initMap();
-          };
-        } else {
-          // Wait for script to load
-          existingScript.addEventListener('load', () => {
-            if (window.google && window.google.maps) {
-              initMap();
-            }
-          });
-        }
-        return;
-      }
-
-      const apiKey = "AIzaSyA3vUl0jnyrAi_awYheUAYjFNDKCUaDpeU";
-      const script = document.createElement('script');
-      // Remove deprecated drawing library and add async loading
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&loading=async&callback=initMapCallback`;
-      script.async = true;
-      script.defer = true;
-      
-      window.initMapCallback = () => {
-        initMap();
-        delete window.initMapCallback;
-      };
-      
-      script.onerror = () => {
+      } catch (error) {
         setError("Failed to load Google Maps. Please check your internet connection.");
-      };
-      
-      document.head.appendChild(script);
-      
-      return () => {
-        if (script.parentNode) {
-          script.parentNode.removeChild(script);
-        }
-        if (window.initMapCallback) {
-          delete window.initMapCallback;
-        }
-      };
+      }
     };
 
-    loadGoogleMapsScript();
+    loadMaps();
   }, [field]);
 
   const initMap = () => {
