@@ -143,7 +143,7 @@ const Navbar = () => {
                   <option value="" disabled hidden>Select Field</option>
                   
                   {fields.map(field => (
-                    <option key={field.id} value={field.name}>{field.name}</option>
+                    <option key={field.id} value={field.id}>{field.name}</option>
                   ))}
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">
@@ -233,7 +233,7 @@ const Navbar = () => {
                     <option value="" disabled hidden>Select Field</option>
                     <option value="new_field">Create New Field</option>
                     {fields.map(field => (
-                      <option key={field.id} value={field.name}>{field.name}</option>
+                      <option key={field.id} value={field.id}>{field.name}</option>
                     ))}
                   </select>
                   <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">

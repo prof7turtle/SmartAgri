@@ -2,6 +2,7 @@
   "id": "1757342364948_362",
   "name": "Field1",
   "location": "Jaipur,Rajasthan",
+  "crop": "Wheat",
   "coordinates": [
     {
       "lat": 26.602276407219282,
