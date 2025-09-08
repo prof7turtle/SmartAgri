@@ -5,6 +5,9 @@ import ClimateAnalysis from './pages/ClimateAnalysis';
 import FarmConsole from './pages/FarmConsole';
 import AIAssistant from './pages/AIAssistant';
 import { AppProvider } from './context/AppContext';
+import VegetationAnalysis from './components/climate/VegetationAnalysis'
+import SoilLandAnalysis from './components/climate/SoilLandAnalysis'
+import WaterIrrigationAnalysis from './components/climate/WaterIrrigationAnalysis'
 
 function App() {
   return (
@@ -17,6 +20,9 @@ function App() {
             <Route path="/farm-console" element={<FarmConsole />} />
             <Route path="/reports" element={<h1>Reports Page (Coming Soon)</h1>} />
             <Route path="/ai-assistant" element={<AIAssistant />} />
+            <Route path="/vegetation" element={<VegetationAnalysis />} />
+            <Route path="/soil" element={<SoilLandAnalysis />} />
+            <Route path="/monsoon" element={<WaterIrrigationAnalysis />} />
             <Route path="*" element={<h1>Page Not Found</h1>} />
           </Routes>
         </Layout>

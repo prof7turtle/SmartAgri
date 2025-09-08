@@ -3,11 +3,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faDroplet,
   faInfoCircle,
-  faTriangleExclamation
+  faTriangleExclamation,
+  faTable,
+  faLeaf,
+  faChartLine,
+  faFlask
 } from '@fortawesome/free-solid-svg-icons';
-import { Line } from 'react-chartjs-2';
+import { Line, Bar } from 'react-chartjs-2';
 import { useAppContext } from '../../context/AppContext';
 import { fetchWaterData } from '../../services/climateService';
+import Papa from 'papaparse';
 
 const WaterIrrigationAnalysis = ({ dateRange, loading, setLoading }) => {
   const { selectedField, selectedLocation } = useAppContext();
