@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMap, faEdit, faTrash, faSearch, faExclamationTriangle, faSpinner, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faMap, faEdit, faTrash, faSearch, faExclamationTriangle, faSpinner, faTimes, faSeedling } from '@fortawesome/free-solid-svg-icons';
 import { API_URLS } from '../config';
 import '../components/fields/Fields.css';
 
@@ -88,7 +88,8 @@ const Fields = () => {
   // Filter fields based on search term
   const filteredFields = fields.filter(field => 
     field.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    field.location.toLowerCase().includes(searchTerm.toLowerCase())
+    field.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (field.crop && field.crop.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   // Sort fields based on sortConfig
@@ -137,7 +138,7 @@ const Fields = () => {
           </div>
           <input
             type="text"
-            placeholder="Search by field name or location..."
+            placeholder="Search by field name, location, or crop..."
             className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-green-500 focus:border-transparent"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -194,6 +195,9 @@ const Fields = () => {
                     <th className="px-6 py-3 border-b border-gray-200 text-gray-500 font-medium text-sm tracking-wider cursor-pointer" onClick={() => handleSort('location')}>
                       Location {getSortIcon('location')}
                     </th>
+                    <th className="px-6 py-3 border-b border-gray-200 text-gray-500 font-medium text-sm tracking-wider cursor-pointer" onClick={() => handleSort('crop')}>
+                      Crop {getSortIcon('crop')}
+                    </th>
                     <th className="px-6 py-3 border-b border-gray-200 text-gray-500 font-medium text-sm tracking-wider cursor-pointer" onClick={() => handleSort('createdAt')}>
                       Created Date {getSortIcon('createdAt')}
                     </th>
@@ -213,6 +217,9 @@ const Fields = () => {
                       </td>
                       <td className="px-6 py-4 border-b border-gray-200 text-gray-500">
                         {field.location}
+                      </td>
+                      <td className="px-6 py-4 border-b border-gray-200 text-gray-500">
+                        {field.crop || 'Not specified'}
                       </td>
                       <td className="px-6 py-4 border-b border-gray-200 text-gray-500">
                         {new Date(field.createdAt).toLocaleDateString()}

@@ -203,12 +203,12 @@ const Dashboard = () => {
                 <div className="bg-gray-50 rounded-lg p-5 border border-gray-100 hover:border-green-300 transition-colors">
                   <div className="flex items-center mb-3">
                     <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center mr-3">
-                      <FontAwesomeIcon icon={faLeaf} className="text-amber-600" />
+                      <FontAwesomeIcon icon={faSeedling} className="text-amber-600" />
                     </div>
-                    <div className="text-sm text-gray-500 font-medium">Crops</div>
+                    <div className="text-sm text-gray-500 font-medium">Crop</div>
                   </div>
                   <div className="text-lg font-semibold text-gray-800">
-                    {fieldData?.crops?.join(', ') || 'None planted'}
+                    {fieldData?.crop || fieldData?.mainCrop || fieldData?.crops?.[0] || 'None planted'}
                   </div>
                   <div className="mt-2 text-sm text-gray-500">
                     <Link to={`/field-detail/${fieldData.id}`} className="text-green-600 hover:text-green-700">
