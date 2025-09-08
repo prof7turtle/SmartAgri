@@ -93,15 +93,7 @@ const SoilLandAnalysis = ({ dateRange, loading, setLoading }) => {
               <p className="text-sm">
                 Comprehensive soil analysis helps determine plant health, nutrient deficiencies, and fertilizer requirements. 
                 Regular soil testing is recommended every 2-3 years.
-              </p>
-              <div className="mt-2 flex items-center">
-                <span className="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">
-                  Last Test: September 1, 2025
-                </span>
-                <span className="text-xs text-amber-700 ml-2">
-                  Next Test Due: September 1, 2027
-                </span>
-              </div>
+              </p>              
             </div>
           </div>
         </div>

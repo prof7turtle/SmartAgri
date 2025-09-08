@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMap, faArrowLeft, faEdit, faTrash, faSpinner, faExclamationTriangle, faSeedling } from '@fortawesome/free-solid-svg-icons';
 import { API_URLS } from '../config';
+import googleMapsLoader from '../utils/googleMapsLoader';
 import '../components/fields/Fields.css';
 
 const FieldDetail = () => {
@@ -47,40 +48,16 @@ const FieldDetail = () => {
   useEffect(() => {
     if (!field || !field.coordinates || field.coordinates.length < 3) return;
 
-    const loadGoogleMapsScript = () => {
-      if (window.google && window.google.maps) {
+    const loadMaps = async () => {
+      try {
+        await googleMapsLoader.loadGoogleMaps(['geometry']);
         initMap();
-        return;
-      }
-
-      const apiKey = "AIzaSyA3vUl0jnyrAi_awYheUAYjFNDKCUaDpeU";
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=drawing&callback=initMapCallback`;
-      script.async = true;
-      script.defer = true;
-      
-      window.initMapCallback = () => {
-        initMap();
-        delete window.initMapCallback;
-      };
-      
-      script.onerror = () => {
+      } catch (error) {
         setError("Failed to load Google Maps. Please check your internet connection.");
-      };
-      
-      document.head.appendChild(script);
-      
-      return () => {
-        if (script.parentNode) {
-          script.parentNode.removeChild(script);
-        }
-        if (window.initMapCallback) {
-          delete window.initMapCallback;
-        }
-      };
+      }
     };
 
-    loadGoogleMapsScript();
+    loadMaps();
   }, [field]);
 
   const initMap = () => {

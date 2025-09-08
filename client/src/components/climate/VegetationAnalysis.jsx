@@ -30,10 +30,16 @@ ChartJS.register(
   Filler
 );
 
-const VegetationAnalysis = ({ dateRange }) => {
+const VegetationAnalysis = ({ dateRange = {} }) => {
   // Define loading state locally
   const [loading, setLoading] = useState(false);
   const { selectedField, selectedLocation } = useAppContext();
+  
+  // Set default date range if not provided
+  const defaultDateRange = {
+    startDate: dateRange.startDate || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 7 days ago
+    endDate: dateRange.endDate || new Date().toISOString().split('T')[0] // Today
+  };
   
   // State for vegetation data from the API
   const [vegetationData, setVegetationData] = useState({
@@ -75,28 +81,75 @@ const VegetationAnalysis = ({ dateRange }) => {
     herbsSpices: ['Basil', 'Mint', 'Coriander']
   });
   
-  // Add refs for chart instances to properly clean up
+  // Add chart visibility states and refs for chart instances to properly clean up
   const ndviChartRef = useRef(null);
   const vegetationIndicesChartRef = useRef(null);
   const nutrientsChartRef = useRef(null);
   
+  // Chart container refs to check if they're in the DOM
+  const ndviContainerRef = useRef(null);
+  const vegetationIndicesContainerRef = useRef(null);
+  const nutrientsContainerRef = useRef(null);
+  
+  // Track chart visibility to prevent errors
+  const [chartsVisible, setChartsVisible] = useState({
+    ndvi: false,
+    vegetationIndices: false,
+    nutrients: false
+  });
+  
+  // Function to safely destroy a chart instance
+  const safeDestroyChart = (chartRef) => {
+    try {
+      if (chartRef.current?.chartInstance) {
+        chartRef.current.chartInstance.destroy();
+      } else if (chartRef.current) {
+        chartRef.current.destroy();
+      }
+    } catch (error) {
+      console.error("Error destroying chart:", error);
+    }
+  };
+
+  // Check if chart containers are in DOM and set visibility
+  useEffect(() => {
+    const checkVisibility = () => {
+      setChartsVisible({
+        ndvi: !!document.getElementById('ndvi-chart-container'),
+        vegetationIndices: !!document.getElementById('vegetation-indices-chart-container'),
+        nutrients: !!document.getElementById('nutrients-chart-container')
+      });
+    };
+    
+    // Initial check
+    checkVisibility();
+    
+    // Add resize observer to recheck on layout changes
+    const observer = new ResizeObserver(() => {
+      checkVisibility();
+    });
+    
+    // Observe the main Analytics container
+    const analyticsContainer = document.querySelector('.Analytics');
+    if (analyticsContainer) {
+      observer.observe(analyticsContainer);
+    }
+    
+    return () => {
+      // Clean up the observer
+      observer.disconnect();
+      
+      // Safely destroy all chart instances
+      safeDestroyChart(ndviChartRef);
+      safeDestroyChart(vegetationIndicesChartRef);
+      safeDestroyChart(nutrientsChartRef);
+    };
+  }, []);
+  
   useEffect(() => {
     loadVegetationData();
     loadVegetationIndicesFromCsv();
-    
-    // Cleanup function to destroy chart instances when unmounting
-    return () => {
-      if (ndviChartRef.current) {
-        ndviChartRef.current.destroy();
-      }
-      if (vegetationIndicesChartRef.current) {
-        vegetationIndicesChartRef.current.destroy();
-      }
-      if (nutrientsChartRef.current) {
-        nutrientsChartRef.current.destroy();
-      }
-    };
-  }, [selectedField, selectedLocation, dateRange]);
+  }, [selectedField, selectedLocation, defaultDateRange.startDate, defaultDateRange.endDate]);
   
   const loadVegetationData = async () => {
     setLoading(true);
@@ -104,7 +157,7 @@ const VegetationAnalysis = ({ dateRange }) => {
       const data = await fetchVegetationData(
         selectedField,
         selectedLocation,
-        dateRange
+        defaultDateRange
       );
       setVegetationData(data);
     } catch (error) {
@@ -608,14 +661,18 @@ const VegetationAnalysis = ({ dateRange }) => {
             </div>
             
             <div className="h-72">
-              <Line 
-                data={ndviChartData} 
-                options={getChartOptions('NDVI Trend Over Time', {
-                  yAxisTitle: 'NDVI Value',
-                  beginAtZero: false
-                })} 
-                ref={ndviChartRef}
-              />
+              <div id="ndvi-chart-container" className="w-full h-full" ref={ndviContainerRef}>
+                {chartsVisible.ndvi && (
+                  <Line 
+                    data={ndviChartData} 
+                    options={getChartOptions('NDVI Trend Over Time', {
+                      yAxisTitle: 'NDVI Value',
+                      beginAtZero: false
+                    })} 
+                    ref={ndviChartRef}
+                  />
+                )}
+              </div>
             </div>
           </div>
           
@@ -762,14 +819,18 @@ const VegetationAnalysis = ({ dateRange }) => {
                   <div className="spinner border-t-4 border-green-500 border-solid rounded-full w-10 h-10 animate-spin"></div>
                 </div>
               ) : (
-                <Line 
-                  data={vegetationIndicesChartData} 
-                  options={getChartOptions('Vegetation Indices Over Time', {
-                    yAxisTitle: 'Index Value',
-                    beginAtZero: false
-                  })} 
-                  ref={vegetationIndicesChartRef} 
-                />
+                <div id="vegetation-indices-chart-container" className="w-full h-full" ref={vegetationIndicesContainerRef}>
+                  {chartsVisible.vegetationIndices && (
+                    <Line 
+                      data={vegetationIndicesChartData} 
+                      options={getChartOptions('Vegetation Indices Over Time', {
+                        yAxisTitle: 'Index Value',
+                        beginAtZero: false
+                      })} 
+                      ref={vegetationIndicesChartRef} 
+                    />
+                  )}
+                </div>
               )}
             </div>
             
@@ -794,7 +855,7 @@ const VegetationAnalysis = ({ dateRange }) => {
               </button>
             </div>
             
-            <div className="mb-4 p-4 bg-gradient-to-r from-green-50 to-white rounded-lg text-sm border-l-4 border-green-500">
+            {/* <div className="mb-4 p-4 bg-gradient-to-r from-green-50 to-white rounded-lg text-sm border-l-4 border-green-500">
               <div className="flex items-center">
                 <FontAwesomeIcon icon={faInfoCircle} className="text-green-600 mr-2 text-lg" />
                 <div>
@@ -810,261 +871,58 @@ const VegetationAnalysis = ({ dateRange }) => {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
             
             <div className="h-60 mb-4">
-              <Bar 
-                data={nutrientsChartData} 
-                options={{
-                  ...getChartOptions('Macronutrient Analysis', {
-                    yAxisTitle: 'Value (kg/ha)',
-                    beginAtZero: true
-                  }),
-                  plugins: {
-                    ...getChartOptions().plugins,
-                    tooltip: {
-                      ...getChartOptions().plugins.tooltip,
-                      callbacks: {
-                        label: function(context) {
-                          const label = context.dataset.label || '';
-                          const value = context.parsed.y !== null ? context.parsed.y : 'N/A';
-                          
-                          // Add nutrient status to tooltip
-                          const nutrientName = context.label.toLowerCase();
-                          let status = '';
-                          
-                          if (nutrientName === 'nitrogen') {
-                            status = keyObservations.nutrients.nitrogen.status;
-                          } else if (nutrientName === 'phosphorus') {
-                            status = keyObservations.nutrients.phosphorus.status;
-                          } else if (nutrientName === 'potassium') {
-                            status = keyObservations.nutrients.potassium.status;
-                          } else if (nutrientName === 'magnesium') {
-                            status = keyObservations.nutrients.magnesium.status;
+              <div id="nutrients-chart-container" className="w-full h-full" ref={nutrientsContainerRef}>
+                {chartsVisible.nutrients && (
+                  <Bar 
+                    data={nutrientsChartData} 
+                    options={{
+                      ...getChartOptions('Macronutrient Analysis', {
+                        yAxisTitle: 'Value (kg/ha)',
+                        beginAtZero: true
+                      }),
+                      plugins: {
+                        ...getChartOptions().plugins,
+                        tooltip: {
+                          ...getChartOptions().plugins.tooltip,
+                          callbacks: {
+                            label: function(context) {
+                              const label = context.dataset.label || '';
+                              const value = context.parsed.y !== null ? context.parsed.y : 'N/A';
+                              
+                              // Add nutrient status to tooltip
+                              const nutrientName = context.label.toLowerCase();
+                              let status = '';
+                              
+                              if (nutrientName === 'nitrogen') {
+                                status = keyObservations.nutrients.nitrogen.status;
+                              } else if (nutrientName === 'phosphorus') {
+                                status = keyObservations.nutrients.phosphorus.status;
+                              } else if (nutrientName === 'potassium') {
+                                status = keyObservations.nutrients.potassium.status;
+                              } else if (nutrientName === 'magnesium') {
+                                status = keyObservations.nutrients.magnesium.status;
+                              }
+                              
+                              return [`${label}: ${value} kg/ha`, `Status: ${status}`];
+                            }
                           }
-                          
-                          return [`${label}: ${value} kg/ha`, `Status: ${status}`];
                         }
                       }
-                    }
-                  }
-                }} 
-                ref={nutrientsChartRef}
-              />
-            </div>
+                    }} 
+                    ref={nutrientsChartRef}
+                  />
+                )}
+              </div>
+            </div>            
+
             
-            {/* NPK Status Cards with Visual Indicators */}
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3">
-              {/* Nitrogen Card */}
-              <div className={`p-4 border rounded-lg ${
-                keyObservations.nutrients.nitrogen.value < 30 
-                  ? 'bg-red-50 border-red-200' 
-                  : keyObservations.nutrients.nitrogen.value < 60 
-                  ? 'bg-amber-50 border-amber-200' 
-                  : 'bg-green-50 border-green-200'
-              }`}>
-                <div className="flex items-start space-x-3">
-                  <div className="flex-shrink-0">
-                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center border-2 border-green-400 shadow-sm">
-                      <span className="text-green-800 font-bold text-lg">N</span>
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <h5 className="font-medium">Nitrogen</h5>
-                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(keyObservations.nutrients.nitrogen.status)}`}>
-                        {keyObservations.nutrients.nitrogen.status}
-                      </span>
-                    </div>
-                    <p className="text-2xl font-bold">{keyObservations.nutrients.nitrogen.value} <span className="text-sm text-gray-500">kg/ha</span></p>
-                    <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
-                      <div 
-                        className={`h-1.5 rounded-full ${
-                          keyObservations.nutrients.nitrogen.value < 30 
-                            ? 'bg-red-500' 
-                            : keyObservations.nutrients.nitrogen.value < 60 
-                            ? 'bg-amber-500' 
-                            : 'bg-green-500'
-                        }`} 
-                        style={{ width: `${Math.min(100, (keyObservations.nutrients.nitrogen.value / 100) * 100)}%` }}
-                      ></div>
-                    </div>
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
-                      <span>Low</span>
-                      <span>Target: 60-80</span>
-                    </div>
-                  </div>
-                </div>
-                
-                {keyObservations.nutrients.nitrogen.value < 60 && (
-                  <div className="mt-3 text-xs text-gray-700 p-2 bg-white rounded">
-                    <div className="font-medium flex items-center">
-                      <FontAwesomeIcon icon={faLeaf} className="text-green-500 mr-1" />
-                      <span>Recommendation</span>
-                    </div>
-                    <p className="mt-1">Apply {Math.max(0, Math.round(60 - keyObservations.nutrients.nitrogen.value))} kg/ha of nitrogen-rich fertilizer.</p>
-                  </div>
-                )}
-              </div>
-              
-              {/* Phosphorus Card */}
-              <div className={`p-4 border rounded-lg ${
-                keyObservations.nutrients.phosphorus.value < 20 
-                  ? 'bg-red-50 border-red-200' 
-                  : keyObservations.nutrients.phosphorus.value < 40 
-                  ? 'bg-amber-50 border-amber-200' 
-                  : 'bg-green-50 border-green-200'
-              }`}>
-                <div className="flex items-start space-x-3">
-                  <div className="flex-shrink-0">
-                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center border-2 border-amber-400 shadow-sm">
-                      <span className="text-amber-800 font-bold text-lg">P</span>
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <h5 className="font-medium">Phosphorus</h5>
-                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(keyObservations.nutrients.phosphorus.status)}`}>
-                        {keyObservations.nutrients.phosphorus.status}
-                      </span>
-                    </div>
-                    <p className="text-2xl font-bold">{keyObservations.nutrients.phosphorus.value} <span className="text-sm text-gray-500">kg/ha</span></p>
-                    <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
-                      <div 
-                        className={`h-1.5 rounded-full ${
-                          keyObservations.nutrients.phosphorus.value < 20 
-                            ? 'bg-red-500' 
-                            : keyObservations.nutrients.phosphorus.value < 40 
-                            ? 'bg-amber-500' 
-                            : 'bg-green-500'
-                        }`} 
-                        style={{ width: `${Math.min(100, (keyObservations.nutrients.phosphorus.value / 60) * 100)}%` }}
-                      ></div>
-                    </div>
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
-                      <span>Low</span>
-                      <span>Target: 40-60</span>
-                    </div>
-                  </div>
-                </div>
-                
-                {keyObservations.nutrients.phosphorus.value < 40 && (
-                  <div className="mt-3 text-xs text-gray-700 p-2 bg-white rounded">
-                    <div className="font-medium flex items-center">
-                      <FontAwesomeIcon icon={faLeaf} className="text-amber-500 mr-1" />
-                      <span>Recommendation</span>
-                    </div>
-                    <p className="mt-1">Apply {Math.max(0, Math.round(40 - keyObservations.nutrients.phosphorus.value))} kg/ha of phosphatic fertilizer.</p>
-                  </div>
-                )}
-              </div>
-              
-              {/* Potassium Card */}
-              <div className={`p-4 border rounded-lg ${
-                keyObservations.nutrients.potassium.value < 100 
-                  ? 'bg-red-50 border-red-200' 
-                  : keyObservations.nutrients.potassium.value < 200 
-                  ? 'bg-amber-50 border-amber-200' 
-                  : 'bg-green-50 border-green-200'
-              }`}>
-                <div className="flex items-start space-x-3">
-                  <div className="flex-shrink-0">
-                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center border-2 border-blue-400 shadow-sm">
-                      <span className="text-blue-800 font-bold text-lg">K</span>
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <h5 className="font-medium">Potassium</h5>
-                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(keyObservations.nutrients.potassium.status)}`}>
-                        {keyObservations.nutrients.potassium.status}
-                      </span>
-                    </div>
-                    <p className="text-2xl font-bold">{keyObservations.nutrients.potassium.value} <span className="text-sm text-gray-500">kg/ha</span></p>
-                    <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
-                      <div 
-                        className={`h-1.5 rounded-full ${
-                          keyObservations.nutrients.potassium.value < 100 
-                            ? 'bg-red-500' 
-                            : keyObservations.nutrients.potassium.value < 200 
-                            ? 'bg-amber-500' 
-                            : 'bg-green-500'
-                        }`} 
-                        style={{ width: `${Math.min(100, (keyObservations.nutrients.potassium.value / 300) * 100)}%` }}
-                      ></div>
-                    </div>
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
-                      <span>Low</span>
-                      <span>Target: 200-300</span>
-                    </div>
-                  </div>
-                </div>
-                
-                {keyObservations.nutrients.potassium.value < 200 && (
-                  <div className="mt-3 text-xs text-gray-700 p-2 bg-white rounded">
-                    <div className="font-medium flex items-center">
-                      <FontAwesomeIcon icon={faLeaf} className="text-blue-500 mr-1" />
-                      <span>Recommendation</span>
-                    </div>
-                    <p className="mt-1">Apply {Math.max(0, Math.round(200 - keyObservations.nutrients.potassium.value))} kg/ha of potassium fertilizer.</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Soil Health Summary */}
-            <div className="mt-6 p-4 bg-gradient-to-r from-amber-50 to-white rounded-lg border border-amber-100">
-              <div className="flex items-start">
-                <div className="flex-shrink-0 bg-amber-100 rounded-full p-2 mr-3">
-                  <FontAwesomeIcon icon={faDna} className="text-amber-700" />
-                </div>
-                <div>
-                  <h4 className="font-medium text-amber-900">Soil Health Summary</h4>
-                  <p className="text-sm text-gray-700 mt-1">
-                    {keyObservations.nutrients.nitrogen.value < 30 || keyObservations.nutrients.phosphorus.value < 20 || keyObservations.nutrients.potassium.value < 100 ? 
-                      'Critical nutrient deficiencies detected. Follow the fertilizer recommendations to address these issues before planting.' :
-                      keyObservations.nutrients.nitrogen.value < 60 || keyObservations.nutrients.phosphorus.value < 40 || keyObservations.nutrients.potassium.value < 200 ?
-                      'Some nutrients are below optimal levels. Apply recommended fertilizers to ensure good crop yields.' :
-                      'Your soil has balanced nutrients for most crops. Continue with regular maintenance fertilization.'}
-                  </p>
-                  
-                  <div className="mt-3 flex items-center space-x-1">
-                    {keyObservations.nutrients.nitrogen.value < 30 || keyObservations.nutrients.phosphorus.value < 20 || keyObservations.nutrients.potassium.value < 100 ? (
-                      <>
-                        <span className="px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">Critical Action Needed</span>
-                      </>
-                    ) : keyObservations.nutrients.nitrogen.value < 60 || keyObservations.nutrients.phosphorus.value < 40 || keyObservations.nutrients.potassium.value < 200 ? (
-                      <>
-                        <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-xs rounded-full">Action Recommended</span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full">Good Condition</span>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Detailed Soil Analysis Link */}
-            <div className="mt-6 border-t pt-4 flex justify-between items-center">
-              <button className="text-sm text-gray-600 flex items-center hover:text-gray-800">
-                <FontAwesomeIcon icon={faChartLine} className="mr-1" />
-                View Nutrient History
-              </button>
-              
-              <button onClick={() => window.location.href = '/climate-analysis?tab=soil'} className="inline-flex items-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-md text-sm transition-colors">
-                View Complete Soil Analysis
-                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </button>
-            </div>
           </div>
 
           {/* Recommended Crops */}
-          <div className="bg-white p-5 rounded-lg shadow-lg border border-gray-100 lg:col-span-1">
+          {/* <div className="bg-white p-5 rounded-lg shadow-lg border border-gray-100 lg:col-span-1">
             <div className="flex items-center mb-4">
               <span className="text-green-600 mr-3">
                 <FontAwesomeIcon icon={faSeedling} size="lg" />
@@ -1133,7 +991,7 @@ const VegetationAnalysis = ({ dateRange }) => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       )}
     </div>

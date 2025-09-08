@@ -73,6 +73,14 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
       [menu]: !prev[menu]
     }));
   };
+  
+  // Handle keyboard navigation for accessibility
+  const handleKeyDown = (e, menu) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleMenu(menu);
+    }
+  };
 
   const isActive = (path) => {
     return location.pathname === path;
@@ -81,15 +89,15 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
   return (
     <aside 
       id="sidebar"
-      className={`fixed top-0 left-0 z-40 h-screen pt-14 transition-all duration-300 ease-in-out bg-gradient-to-b from-green to-gray-50 border-r border-gray-200 shadow-sm ${
+      className={`fixed top-0 left-0 z-40 h-screen pt-14 transition-all duration-300 ease-in-out bg-gradient-to-b from-green to-gray-50 border-r border-gray-200 shadow-md ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-      } ${isMobile ? 'w-72' : ''} ${!isMobile && isCollapsed ? 'md:w-20' : 'md:w-64'}` }
+      } ${isMobile ? 'w-[85vw]' : ''} ${!isMobile && isCollapsed ? 'md:w-20' : 'md:w-64'}` }
       aria-label="Sidebar"
     >
-      <div className="h-full flex flex-col justify-between overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300">
+      <div className="h-full flex flex-col justify-between overflow-y-auto pb-20 md:pb-0 overscroll-contain scroll-smooth">
         <div>
           {/* Top section with logo & collapse button */}
-          <div className="flex items-center justify-between py-2 px-3 border-b border-gray-200">
+          <div className="flex items-center justify-between py-3 px-4 border-b border-gray-200 sticky top-0 bg-white bg-opacity-95 backdrop-blur-sm z-10 shadow-sm">
             {!isCollapsed && (
               <div className="flex items-center space-x-2">
                 <span className="font-bold text-green-700 text-lg">Smart Agri</span>
@@ -100,8 +108,9 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
             <button 
               onClick={toggleSidebar} 
               type="button" 
-              className={`${isCollapsed ? 'mx-auto' : ''} inline-flex items-center justify-center p-1.5 rounded-lg text-gray-600 hover:bg-green-50 hover:text-green-700 transition-colors`}
+              className={`${isCollapsed ? 'mx-auto' : ''} inline-flex items-center justify-center p-2 rounded-lg text-gray-600 hover:bg-green-50 hover:text-green-700 transition-colors`}
               aria-expanded={!isCollapsed}
+              aria-label="Toggle sidebar collapse"
             >
               <FontAwesomeIcon icon={isCollapsed ? faChevronRight : faChevronLeft} className="w-4 h-4" />
               <span className="sr-only">Toggle sidebar</span>
@@ -120,11 +129,11 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                 <li>
                   <Link
                     to="/"
-                    className={`flex items-center px-3 py-2.5 rounded-lg ${isCollapsed ? 'justify-center' : ''} ${
+                    className={`flex items-center px-3 py-3 rounded-lg ${isCollapsed ? 'justify-center' : ''} ${
                       isActive('/') 
                         ? 'bg-green-100 text-green-800 font-medium' 
                         : 'text-gray-700 hover:bg-gray-100'
-                    } group transition-colors duration-150`}
+                    } group transition-colors duration-150 ${isMobile ? 'active:bg-green-50' : ''}`}
                   >
                     <FontAwesomeIcon
                       icon={faHome}
@@ -283,10 +292,12 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                 <li>
                   <button
                     type="button"
-                    className={`flex items-center w-full px-3 py-2.5 rounded-lg text-left text-gray-700 ${
+                    className={`flex items-center w-full px-3 py-3 rounded-lg text-left text-gray-700 ${
                       isCollapsed ? 'justify-center' : ''
-                    } hover:bg-gray-100 transition-colors duration-150`}
+                    } hover:bg-gray-100 transition-colors duration-150 ${isMobile ? 'active:bg-gray-50' : ''}`}
                     onClick={() => toggleMenu('analytics')}
+                    onKeyDown={(e) => handleKeyDown(e, 'analytics')}
+                    aria-expanded={expandedMenus.analytics}
                   >
                     <FontAwesomeIcon
                       icon={faCloudSunRain}
@@ -297,7 +308,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                         <span className="ml-3 mr-auto font-medium">Climate Analysis</span>
                         <FontAwesomeIcon
                           icon={expandedMenus.analytics ? faAngleDown : faAngleRight}
-                          className="w-4 h-4"
+                          className="w-5 h-5"
                         />
                       </>
                     )}
@@ -305,14 +316,14 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
 
                   {expandedMenus.analytics && !isCollapsed && (
                     <ul className="mt-1 pl-7 space-y-1">
-                      <li>
+                      {/* <li>
                         <Link
                           to="/climate"
-                          className={`flex items-center px-3 py-2 rounded-md ${
+                          className={`flex items-center px-3 py-2.5 rounded-md ${
                             isActive('/climate') 
                               ? 'bg-green-50 text-green-800' 
                               : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                          } transition-colors duration-150`}
+                          } transition-colors duration-150 ${isMobile ? 'active:bg-green-50/80' : ''}`}
                         >
                           <FontAwesomeIcon
                             icon={faCloudSunRain}
@@ -320,7 +331,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                           />
                           <span>Weather Forecast</span>
                         </Link>
-                      </li>
+                      </li> */}
                       <li>
                         <Link
                           to="/vegetation"
@@ -334,7 +345,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                             icon={faLeaf}
                             className={`w-4 h-4 mr-2 ${isActive('/vegetation') ? 'text-green-700' : 'text-gray-500'}`}
                           />
-                          <span>Vegetation Health</span>
+                          <span>Soil & Vegetation</span>
                         </Link>
                       </li>
                       {/* <li>
@@ -369,7 +380,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                           <span>Water Irrigation</span>
                         </Link>
                       </li>
-                      <li>
+                      {/* <li>
                         <Link
                           to="/soil"
                           className={`flex items-center px-3 py-2 rounded-md ${
@@ -384,7 +395,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                           />
                           <span>Soil Info</span>
                         </Link>
-                      </li>
+                      </li> */}
                     </ul>
                   )}
                 </li>
@@ -609,15 +620,15 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                     to="/ai-assistant"
                     className={`flex items-center px-3 py-2.5 rounded-lg ${isCollapsed ? 'justify-center' : ''} ${
                       isActive('/ai-assistant') 
-                        ? 'bg-blue-100 text-blue-800 font-medium' 
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-blue-100 text-blue-800 font-medium rounded-lg' 
+                        : 'text-gray-700 hover:bg-gray-100 rounded-lg'
                     } group transition-colors duration-150`}
                   >
                     <FontAwesomeIcon
                       icon={faRobot}
                       className={`w-5 h-5 ${isActive('/ai-assistant') ? 'text-blue-600' : 'text-gray-500 group-hover:text-gray-900'}`}
                     />
-                    {!isCollapsed && <span className="ml-3 whitespace-nowrap">AI Assistant</span>}
+                    {!isCollapsed && <span className="ml-3 whitespace-nowrap ">AI Assistant</span>}
                   </Link>
                 </li>
               </ul>
@@ -650,7 +661,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                   {!isCollapsed && <span className="ml-3 whitespace-nowrap">Admin</span>}
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   to="/settings"
                   className={`flex items-center px-3 py-2.5 rounded-lg ${isCollapsed ? 'justify-center' : ''} ${
@@ -665,11 +676,11 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                   />
                   {!isCollapsed && <span className="ml-3 whitespace-nowrap">Settings</span>}
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link
                   to="/logout"
-                  className="flex items-center px-3 py-2.5 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-700 transition-colors duration-150"
+                  className="flex items-center px-3 py-2.5 text-red-400 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-700 transition-colors duration-150"
                 >
                   <FontAwesomeIcon
                     icon={faArrowRightFromBracket}

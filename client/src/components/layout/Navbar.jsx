@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -16,6 +16,8 @@ import { useAppContext } from '../../context/AppContext';
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const mobileMenuRef = useRef(null);
+  const menuButtonRef = useRef(null);
   
   // Safely use context with default values if context is undefined
   const contextValue = useAppContext() || {};
@@ -37,6 +39,35 @@ const Navbar = () => {
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
+  
+  // Click outside to close mobile menu
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (mobileMenuOpen && 
+          mobileMenuRef.current && 
+          !mobileMenuRef.current.contains(event.target) &&
+          menuButtonRef.current && 
+          !menuButtonRef.current.contains(event.target)) {
+        setMobileMenuOpen(false);
+      }
+    };
+    
+    // Handle Escape key to close menu
+    const handleEscape = (event) => {
+      if (event.key === 'Escape' && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+        menuButtonRef.current?.focus();
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [mobileMenuOpen]);
   
   const handleFieldChange = (e) => {
     const value = e.target.value;
@@ -80,21 +111,24 @@ const Navbar = () => {
   return (
     <>
       <nav className="fixed top-0 z-50 w-full bg-gradient-to-r from-green-900 to-[#192a06] border-b border-green-800 shadow-lg">
-        <div className="container mx-auto px-4 py-2">
+        <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">            
             <Link to="/" className="flex items-center space-x-2">
               <FontAwesomeIcon icon={faLeaf} className="text-green-400 text-2xl" />
               <span className="text-xl font-bold text-white whitespace-nowrap">
-                Smart Agriculture
+                {window.innerWidth < 360 ? "Smart Agri" : "Smart Agriculture"}
               </span>
             </Link> 
             
             {/* Mobile menu button */}
             <button 
-              className="md:hidden text-white hover:bg-green-800 p-2 rounded-md transition duration-200"
+              ref={menuButtonRef}
+              className="md:hidden text-white hover:bg-green-800 p-2.5 rounded-lg transition duration-200"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileMenuOpen}
             >
-              <FontAwesomeIcon icon={mobileMenuOpen ? faXmark : faBars} />
+              <FontAwesomeIcon icon={mobileMenuOpen ? faXmark : faBars} className="text-lg" />
             </button>
             
             {/* Desktop Navigation */}
@@ -189,15 +223,19 @@ const Navbar = () => {
           </div>
           
           {/* Mobile Navigation Menu */}
-          {mobileMenuOpen && (
-            <div className="md:hidden mt-3 py-4 border-t border-green-800 bg-gradient-to-b from-[#192a06] to-green-900 rounded-b-lg shadow-lg">
+          <div 
+            ref={mobileMenuRef} 
+            className={`md:hidden mt-3 py-4 border-t border-green-800 bg-gradient-to-b from-[#192a06] to-green-900 rounded-b-lg shadow-lg fixed top-[60px] left-0 right-0 max-h-[calc(100vh-60px)] overflow-y-auto z-50 transition-all duration-300 transform ${
+              mobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-5 pointer-events-none'
+            }`}
+          >
               {/* Mobile Search */}
               <form onSubmit={handleSearch} className="mb-4 px-4">
                 <div className="flex rounded-md overflow-hidden shadow-sm">
                   <input
                     type="text"
                     placeholder="Search..."
-                    className="flex-1 px-4 py-2 outline-none border-2 border-green-100 focus:border-green-300"
+                    className="flex-1 px-4 py-3 outline-none border-2 border-green-100 focus:border-green-300 text-base"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
@@ -208,13 +246,13 @@ const Navbar = () => {
               </form>
               
               {/* Create Field Button - Mobile */}
-              <div className="px-4 mb-4">
+              <div className="px-4 mb-5">
                 <button 
                   onClick={() => {
                     navigate('/create-field');
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center justify-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md font-medium transition duration-200"
+                  className="w-full flex items-center justify-center px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-md font-medium transition duration-200 text-base"
                 >
                   <FontAwesomeIcon icon={faPlus} className="mr-2" />
                   <span>Create Field</span>
@@ -222,11 +260,11 @@ const Navbar = () => {
               </div>
               
               {/* Mobile Field Selection */}
-              <div className="mb-4 px-4">
-                <label className="block text-sm font-medium text-white mb-1">Select Field</label>
+              <div className="mb-5 px-4">
+                <label className="block text-sm font-medium text-white mb-2">Select Field</label>
                 <div className="relative">
                   <select
-                    className="w-full border border-green-100 rounded-md px-3 py-2 bg-white text-gray-700 appearance-none focus:outline-none"
+                    className="w-full border border-green-100 rounded-md px-3 py-3 bg-white text-gray-700 appearance-none focus:outline-none text-base"
                     onChange={handleFieldChange}
                     value={selectedField || ''}
                   >
@@ -243,11 +281,11 @@ const Navbar = () => {
               </div>
               
               {/* Mobile Location */}
-              <div className="mb-4 px-4">
-                <label className="block text-sm font-medium text-white mb-1">Location</label>
+              <div className="mb-5 px-4">
+                <label className="block text-sm font-medium text-white mb-2">Location</label>
                 <input 
                   list="mobile-location-options" 
-                  className="w-full border border-green-100 rounded-md px-3 py-2 bg-white text-gray-700"
+                  className="w-full border border-green-100 rounded-md px-3 py-3 bg-white text-gray-700 text-base"
                   placeholder="Select Location"
                   value={selectedLocation}
                   onChange={handleLocationChange}
@@ -260,28 +298,41 @@ const Navbar = () => {
               </div>
               
               {/* Mobile Navigation Buttons */}
-              <div className="space-y-2">
+              <div className="space-y-0 divide-y divide-green-800">
                 <button 
-                  onClick={navigateToClimateAnalysis}
-                  className="w-full text-left px-3 py-2 rounded hover:bg-gray-100 block"
+                  onClick={() => {
+                    navigateToClimateAnalysis();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full text-left px-5 py-3.5 text-white hover:bg-green-800/50 block transition-colors text-base font-medium"
                 >
                   Climate Analysis
                 </button>
                 <button 
-                  onClick={navigateToFarmConsole}
-                  className="w-full text-left px-3 py-2 rounded hover:bg-gray-100 block"
+                  onClick={() => {
+                    navigateToFarmConsole();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full text-left px-5 py-3.5 text-white hover:bg-green-800/50 block transition-colors text-base font-medium"
                 >
                   Farm Console
                 </button>
                 <Link 
                   to="/reports"
-                  className="w-full text-left px-3 py-2 rounded hover:bg-gray-100 block"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-left px-5 py-3.5 text-white hover:bg-green-800/50 block transition-colors text-base font-medium"
                 >
                   Reports
                 </Link>
+                <Link 
+                  to="/ai-assistant"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-left px-5 py-3.5 text-white hover:bg-green-800/50 block transition-colors text-base font-medium"
+                >
+                  AI Assistant
+                </Link>
               </div>
             </div>
-          )}
         </div>
       </nav>
         
