@@ -9,6 +9,7 @@ import CreateField from './pages/CreateField';
 import Fields from './pages/Fields';
 import FieldDetail from './pages/FieldDetail';
 import FinancialAid from './pages/FinancialAid';
+import WaterManagement from './pages/WaterManagement';
 import { AppProvider } from './context/AppContext';
 import VegetationAnalysis from './components/climate/VegetationAnalysis'
 import SoilLandAnalysis from './components/climate/SoilLandAnalysis'
@@ -27,6 +28,8 @@ function App() {
             <Route path="/crop-planning" element={<CropManagement />} />
             <Route path="/crop-health" element={<CropManagement />} />
             <Route path="/financial-aid" element={<FinancialAid />} />
+            <Route path="/water-management" element={<WaterManagement />} />
+            <Route path="/irrigation" element={<WaterManagement />} />
             <Route path="/reports" element={<h1>Reports Page (Coming Soon)</h1>} />
             <Route path="/ai-assistant" element={<AIAssistant />} />
             <Route path="/soil" element={<SoilLandAnalysis />} />
