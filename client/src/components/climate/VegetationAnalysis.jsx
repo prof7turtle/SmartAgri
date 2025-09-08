@@ -30,10 +30,16 @@ ChartJS.register(
   Filler
 );
 
-const VegetationAnalysis = ({ dateRange }) => {
+const VegetationAnalysis = ({ dateRange = {} }) => {
   // Define loading state locally
   const [loading, setLoading] = useState(false);
   const { selectedField, selectedLocation } = useAppContext();
+  
+  // Set default date range if not provided
+  const defaultDateRange = {
+    startDate: dateRange.startDate || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 7 days ago
+    endDate: dateRange.endDate || new Date().toISOString().split('T')[0] // Today
+  };
   
   // State for vegetation data from the API
   const [vegetationData, setVegetationData] = useState({
@@ -75,28 +81,75 @@ const VegetationAnalysis = ({ dateRange }) => {
     herbsSpices: ['Basil', 'Mint', 'Coriander']
   });
   
-  // Add refs for chart instances to properly clean up
+  // Add chart visibility states and refs for chart instances to properly clean up
   const ndviChartRef = useRef(null);
   const vegetationIndicesChartRef = useRef(null);
   const nutrientsChartRef = useRef(null);
   
+  // Chart container refs to check if they're in the DOM
+  const ndviContainerRef = useRef(null);
+  const vegetationIndicesContainerRef = useRef(null);
+  const nutrientsContainerRef = useRef(null);
+  
+  // Track chart visibility to prevent errors
+  const [chartsVisible, setChartsVisible] = useState({
+    ndvi: false,
+    vegetationIndices: false,
+    nutrients: false
+  });
+  
+  // Function to safely destroy a chart instance
+  const safeDestroyChart = (chartRef) => {
+    try {
+      if (chartRef.current?.chartInstance) {
+        chartRef.current.chartInstance.destroy();
+      } else if (chartRef.current) {
+        chartRef.current.destroy();
+      }
+    } catch (error) {
+      console.error("Error destroying chart:", error);
+    }
+  };
+
+  // Check if chart containers are in DOM and set visibility
+  useEffect(() => {
+    const checkVisibility = () => {
+      setChartsVisible({
+        ndvi: !!document.getElementById('ndvi-chart-container'),
+        vegetationIndices: !!document.getElementById('vegetation-indices-chart-container'),
+        nutrients: !!document.getElementById('nutrients-chart-container')
+      });
+    };
+    
+    // Initial check
+    checkVisibility();
+    
+    // Add resize observer to recheck on layout changes
+    const observer = new ResizeObserver(() => {
+      checkVisibility();
+    });
+    
+    // Observe the main Analytics container
+    const analyticsContainer = document.querySelector('.Analytics');
+    if (analyticsContainer) {
+      observer.observe(analyticsContainer);
+    }
+    
+    return () => {
+      // Clean up the observer
+      observer.disconnect();
+      
+      // Safely destroy all chart instances
+      safeDestroyChart(ndviChartRef);
+      safeDestroyChart(vegetationIndicesChartRef);
+      safeDestroyChart(nutrientsChartRef);
+    };
+  }, []);
+  
   useEffect(() => {
     loadVegetationData();
     loadVegetationIndicesFromCsv();
-    
-    // Cleanup function to destroy chart instances when unmounting
-    return () => {
-      if (ndviChartRef.current) {
-        ndviChartRef.current.destroy();
-      }
-      if (vegetationIndicesChartRef.current) {
-        vegetationIndicesChartRef.current.destroy();
-      }
-      if (nutrientsChartRef.current) {
-        nutrientsChartRef.current.destroy();
-      }
-    };
-  }, [selectedField, selectedLocation, dateRange]);
+  }, [selectedField, selectedLocation, defaultDateRange.startDate, defaultDateRange.endDate]);
   
   const loadVegetationData = async () => {
     setLoading(true);
@@ -104,7 +157,7 @@ const VegetationAnalysis = ({ dateRange }) => {
       const data = await fetchVegetationData(
         selectedField,
         selectedLocation,
-        dateRange
+        defaultDateRange
       );
       setVegetationData(data);
     } catch (error) {
@@ -608,14 +661,18 @@ const VegetationAnalysis = ({ dateRange }) => {
             </div>
             
             <div className="h-72">
-              <Line 
-                data={ndviChartData} 
-                options={getChartOptions('NDVI Trend Over Time', {
-                  yAxisTitle: 'NDVI Value',
-                  beginAtZero: false
-                })} 
-                ref={ndviChartRef}
-              />
+              <div id="ndvi-chart-container" className="w-full h-full" ref={ndviContainerRef}>
+                {chartsVisible.ndvi && (
+                  <Line 
+                    data={ndviChartData} 
+                    options={getChartOptions('NDVI Trend Over Time', {
+                      yAxisTitle: 'NDVI Value',
+                      beginAtZero: false
+                    })} 
+                    ref={ndviChartRef}
+                  />
+                )}
+              </div>
             </div>
           </div>
           
@@ -762,14 +819,18 @@ const VegetationAnalysis = ({ dateRange }) => {
                   <div className="spinner border-t-4 border-green-500 border-solid rounded-full w-10 h-10 animate-spin"></div>
                 </div>
               ) : (
-                <Line 
-                  data={vegetationIndicesChartData} 
-                  options={getChartOptions('Vegetation Indices Over Time', {
-                    yAxisTitle: 'Index Value',
-                    beginAtZero: false
-                  })} 
-                  ref={vegetationIndicesChartRef} 
-                />
+                <div id="vegetation-indices-chart-container" className="w-full h-full" ref={vegetationIndicesContainerRef}>
+                  {chartsVisible.vegetationIndices && (
+                    <Line 
+                      data={vegetationIndicesChartData} 
+                      options={getChartOptions('Vegetation Indices Over Time', {
+                        yAxisTitle: 'Index Value',
+                        beginAtZero: false
+                      })} 
+                      ref={vegetationIndicesChartRef} 
+                    />
+                  )}
+                </div>
               )}
             </div>
             
@@ -813,44 +874,48 @@ const VegetationAnalysis = ({ dateRange }) => {
             </div>
             
             <div className="h-60 mb-4">
-              <Bar 
-                data={nutrientsChartData} 
-                options={{
-                  ...getChartOptions('Macronutrient Analysis', {
-                    yAxisTitle: 'Value (kg/ha)',
-                    beginAtZero: true
-                  }),
-                  plugins: {
-                    ...getChartOptions().plugins,
-                    tooltip: {
-                      ...getChartOptions().plugins.tooltip,
-                      callbacks: {
-                        label: function(context) {
-                          const label = context.dataset.label || '';
-                          const value = context.parsed.y !== null ? context.parsed.y : 'N/A';
-                          
-                          // Add nutrient status to tooltip
-                          const nutrientName = context.label.toLowerCase();
-                          let status = '';
-                          
-                          if (nutrientName === 'nitrogen') {
-                            status = keyObservations.nutrients.nitrogen.status;
-                          } else if (nutrientName === 'phosphorus') {
-                            status = keyObservations.nutrients.phosphorus.status;
-                          } else if (nutrientName === 'potassium') {
-                            status = keyObservations.nutrients.potassium.status;
-                          } else if (nutrientName === 'magnesium') {
-                            status = keyObservations.nutrients.magnesium.status;
+              <div id="nutrients-chart-container" className="w-full h-full" ref={nutrientsContainerRef}>
+                {chartsVisible.nutrients && (
+                  <Bar 
+                    data={nutrientsChartData} 
+                    options={{
+                      ...getChartOptions('Macronutrient Analysis', {
+                        yAxisTitle: 'Value (kg/ha)',
+                        beginAtZero: true
+                      }),
+                      plugins: {
+                        ...getChartOptions().plugins,
+                        tooltip: {
+                          ...getChartOptions().plugins.tooltip,
+                          callbacks: {
+                            label: function(context) {
+                              const label = context.dataset.label || '';
+                              const value = context.parsed.y !== null ? context.parsed.y : 'N/A';
+                              
+                              // Add nutrient status to tooltip
+                              const nutrientName = context.label.toLowerCase();
+                              let status = '';
+                              
+                              if (nutrientName === 'nitrogen') {
+                                status = keyObservations.nutrients.nitrogen.status;
+                              } else if (nutrientName === 'phosphorus') {
+                                status = keyObservations.nutrients.phosphorus.status;
+                              } else if (nutrientName === 'potassium') {
+                                status = keyObservations.nutrients.potassium.status;
+                              } else if (nutrientName === 'magnesium') {
+                                status = keyObservations.nutrients.magnesium.status;
+                              }
+                              
+                              return [`${label}: ${value} kg/ha`, `Status: ${status}`];
+                            }
                           }
-                          
-                          return [`${label}: ${value} kg/ha`, `Status: ${status}`];
                         }
                       }
-                    }
-                  }
-                }} 
-                ref={nutrientsChartRef}
-              />
+                    }} 
+                    ref={nutrientsChartRef}
+                  />
+                )}
+              </div>
             </div>
             
             {/* NPK Status Cards with Visual Indicators */}
