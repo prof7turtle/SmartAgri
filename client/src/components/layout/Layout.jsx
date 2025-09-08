@@ -57,7 +57,7 @@ const Layout = ({ children }) => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-green-100 to-blue-800 to-red-200 border-r border-green-200 shadow-sm overflow-hidden">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-100 to-green-100 border-r border-green-200 shadow-sm overflow-hidden">
       <Navbar />
       
       {/* Mobile Menu Button */}
