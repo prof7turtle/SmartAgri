@@ -94,10 +94,14 @@ export const fetchFieldData = async (fieldId) => {
     const fieldSize = calculateFieldArea(data.field.coordinates);
     
     // Add additional properties needed for the dashboard
+    // Handle the field with crop data
+    const crop = data.field.crop || 'Not specified';
+    
     return {
       ...data.field,
       size: fieldSize.toFixed(2), // converted to acres
-      crops: ['Wheat', 'Corn'], // Default crops for now
+      crops: [crop], // Use the crop from the field data
+      mainCrop: crop, // Add main crop directly for easy access
       soilType: 'Clay Loam',
       plantingDate: '2025-06-10',
       ndviHistory: [
@@ -116,7 +120,9 @@ export const fetchFieldData = async (fieldId) => {
       name: `Field ${fieldId}`,
       size: 20, // acres
       location: 'Unknown',
-      crops: ['Wheat', 'Corn'],
+      crop: 'Wheat', // Default crop
+      crops: ['Wheat'],
+      mainCrop: 'Wheat',
       soilType: 'Clay Loam',
       plantingDate: '2025-06-10',
       ndviHistory: [

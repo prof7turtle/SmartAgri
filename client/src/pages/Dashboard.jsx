@@ -23,7 +23,13 @@ import { useAppContext } from '../context/AppContext';
 import { fetchWeatherForecast, fetchFieldData, fetchFields } from '../services/dataService';
 
 const Dashboard = () => {
-  const { selectedField, setSelectedField, fields, refreshFields } = useAppContext();
+  const contextValue = useAppContext() || {};
+  const { 
+    selectedField = '', 
+    setSelectedField = () => {}, 
+    fields = [], 
+    refreshFields = async () => {} 
+  } = contextValue;
   const [fieldData, setFieldData] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(true);

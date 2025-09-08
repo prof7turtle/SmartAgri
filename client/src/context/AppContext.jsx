@@ -1,8 +1,24 @@
 import { createContext, useState, useContext, useEffect } from 'react';
 import { fetchFields } from '../services/dataService';
 
-// Create the context
-const AppContext = createContext();
+// Create the context with default values
+const AppContext = createContext({
+  selectedField: '',
+  setSelectedField: () => {},
+  selectedLocation: '',
+  setSelectedLocation: () => {},
+  fields: [],
+  loading: false,
+  addField: () => {},
+  refreshFields: async () => {},
+  analyticsData: {
+    weather: {},
+    vegetation: {},
+    soil: {},
+    water: {}
+  },
+  updateAnalyticsData: () => {}
+});
 
 // Create a custom hook to use the context
 export const useAppContext = () => useContext(AppContext);

@@ -222,6 +222,7 @@ const Fields = () => {
                       </td>
                       <td className="px-6 py-4 border-b border-gray-200 text-right">
                         <div className="flex justify-end space-x-2">
+                          <div className='pr-8 flex gap-4'>
                           <Link
                             to={`/field-detail/${field.id}`}
                             className="text-indigo-600 hover:text-indigo-900"
@@ -230,12 +231,14 @@ const Fields = () => {
                             View
                           </Link>
                           <Link
-                            to={`/edit-field/${field.id}`}
+                            to={`/field-detail/${field.id}`}
                             className="text-blue-600 hover:text-blue-900"
                             title="Edit field"
                           >
+                            
                             <FontAwesomeIcon icon={faEdit} />
                           </Link>
+                          </div>
                           {deleteConfirm === field.id ? (
                             <div className="flex items-center ml-1">
                               <button

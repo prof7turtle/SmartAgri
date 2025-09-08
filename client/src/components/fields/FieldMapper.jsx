@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMap, faSave, faEraser, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { faMap, faSave, faEraser, faExclamationTriangle, faSeedling } from '@fortawesome/free-solid-svg-icons';
 import { API_URLS } from '../../config';
 import './FieldMapper.css';
 
@@ -11,9 +11,18 @@ const FieldMapper = () => {
   const [currentPolygon, setCurrentPolygon] = useState(null);
   const [fieldName, setFieldName] = useState('');
   const [fieldLocation, setFieldLocation] = useState('');
+  const [selectedCrop, setSelectedCrop] = useState('');
   const [coordinates, setCoordinates] = useState([]);
   const [message, setMessage] = useState({ show: false, text: '', type: 'info' });
   const [loading, setLoading] = useState(false);
+  
+  // List of major crops grown in India
+  const cropOptions = [
+    'Rice', 'Wheat', 'Maize', 'Jowar (Sorghum)', 'Bajra (Pearl Millet)', 
+    'Cotton', 'Sugarcane', 'Pulses', 'Groundnut', 'Mustard', 
+    'Soybean', 'Sunflower', 'Jute', 'Coffee', 'Tea', 
+    'Rubber', 'Tobacco', 'Onion', 'Potato', 'Tomato'
+  ];
 
   // Initialize the Google Maps and drawing tools
   useEffect(() => {
@@ -151,6 +160,7 @@ const FieldMapper = () => {
     setCoordinates([]);
     setFieldName('');
     setFieldLocation('');
+    setSelectedCrop('');
     
     if (drawingManager) {
       drawingManager.setDrawingMode(window.google.maps.drawing.OverlayType.POLYGON);
@@ -186,6 +196,15 @@ const FieldMapper = () => {
       return;
     }
     
+    if (!selectedCrop) {
+      setMessage({
+        show: true,
+        text: "Please select a crop for this field.",
+        type: 'error'
+      });
+      return;
+    }
+    
     if (!coordinates || coordinates.length < 3) {
       setMessage({
         show: true,
@@ -206,6 +225,7 @@ const FieldMapper = () => {
         id: fieldId,
         name: fieldName,
         location: fieldLocation,
+        crop: selectedCrop,
         coordinates: coordinates,
         createdAt: new Date().toISOString()
       };
@@ -303,6 +323,30 @@ const FieldMapper = () => {
                 onChange={(e) => setFieldLocation(e.target.value)}
                 disabled={loading}
               />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="cropSelect" className="flex items-center">
+                <FontAwesomeIcon icon={faSeedling} className="mr-2 text-green-600" />
+                Select Crop
+              </label>
+              <select
+                id="cropSelect"
+                className="form-control"
+                value={selectedCrop}
+                onChange={(e) => setSelectedCrop(e.target.value)}
+                disabled={loading}
+              >
+                <option value="">-- Select Crop --</option>
+                {cropOptions.map((crop) => (
+                  <option key={crop} value={crop}>
+                    {crop}
+                  </option>
+                ))}
+              </select>
+              <div className="text-xs text-gray-500 mt-1">
+                Select the crop you are planning to grow in this field
+              </div>
             </div>
           </div>
           

@@ -29,16 +29,17 @@ app.post('/api/fields', (req, res) => {
     const fieldData = req.body;
     
     // Validate required fields
-    if (!fieldData.name || !fieldData.location || !fieldData.coordinates || fieldData.coordinates.length < 3) {
+    if (!fieldData.name || !fieldData.location || !fieldData.crop || !fieldData.coordinates || fieldData.coordinates.length < 3) {
       console.log('Validation failed:', { 
         name: !!fieldData.name, 
         location: !!fieldData.location, 
+        crop: !!fieldData.crop,
         coordinates: fieldData.coordinates ? fieldData.coordinates.length : 0 
       });
       
       return res.status(400).json({ 
         success: false, 
-        message: 'Invalid field data. Name, location, and at least 3 coordinates are required.' 
+        message: 'Invalid field data. Name, location, crop, and at least 3 coordinates are required.' 
       });
     }
     

@@ -133,7 +133,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                     {!isCollapsed && <span className="ml-3 whitespace-nowrap">Dashboard</span>}
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link
                     to="/reports"
                     className={`flex items-center px-3 py-2.5 rounded-lg ${isCollapsed ? 'justify-center' : ''} ${
@@ -148,7 +148,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                     />
                     {!isCollapsed && <span className="ml-3 whitespace-nowrap">Reports</span>}
                   </Link>
-                </li>
+                </li> */}
                 
                 {/* <li>
                   <Link
