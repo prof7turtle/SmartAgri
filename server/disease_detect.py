@@ -1,56 +1,118 @@
+import os
+import sys
+import glob
 import time
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
-from google.cloud import vision
-import io
 
-client = vision.ImageAnnotatorClient.from_service_account_file('linen-marking-452309-e9-26175acd071a.json')
+import cv2
+import numpy as np
+from ultralytics import YOLO
 
-WATCH_FOLDER = 'sort_detected_image'
+# ---------------------------
+# User settings
+# ---------------------------
+model_path = r"I:/Projects/SmartAgri/server/tea1.pt"
+img_source = r"I:/Projects/SmartAgri/server/crop_imgs/disease/tea/img.png"
+output_dir = r"I:/Projects/SmartAgri/server/detect_results/disease/tea"
+min_thresh = 0.5
+user_res = "480x480"
+# ---------------------------
 
-class detected_image_handler(FileSystemEventHandler):
-    def on_created(self, event):
-        if event.is_directory:
-            return
-        
-        file_path = event.src_path
-        if file_path.lower().endswith(('.png', '.jpg', '.jpeg')):  # Process only images
-            with io.open(file_path, 'rb') as image_file:
-                content = image_file.read()
-            image = vision.Image(content=content)
-            response=client.text_detection(image=image)
-            texts=response.text_annotations
-            print(f'New License no. [{texts[0].description}]')
-            # time.sleep(3)
+# Check if model exists
+if not os.path.exists(model_path):
+    print('ERROR: Model path is invalid or not found.')
+    sys.exit(0)
 
-    def on_modified(self, event):
-        if event.is_directory:
-            return
-        
-        file_path = event.src_path
-        if file_path.lower().endswith(('.png', '.jpg', '.jpeg')):  # Process only images
-            with io.open(file_path, 'rb') as image_file:
-                content = image_file.read()
-            image = vision.Image(content=content)
-            response=client.text_detection(image=image)
-            texts=response.text_annotations
-            print(f'Modified License no. [{texts[0].description}]')
-            # time.sleep(3)
+# Load YOLO model
+model = YOLO(model_path, task='detect')
+labels = model.names
 
-def start_monitoring():
-    
-    event_handler = detected_image_handler()
-    observer = Observer()
-    observer.schedule(event_handler, WATCH_FOLDER, recursive=True)
-    observer.start()
-    print(f"Watching: {WATCH_FOLDER}")
+# Detect source type
+img_ext_list = ['.jpg','.JPG','.jpeg','.JPEG','.png','.PNG','.bmp','.BMP']
+vid_ext_list = ['.avi','.mov','.mp4','.mkv','.wmv']
 
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        observer.stop()
-    observer.join()
+if os.path.isdir(img_source):
+    source_type = 'folder'
+elif os.path.isfile(img_source):
+    _, ext = os.path.splitext(img_source)
+    if ext in img_ext_list:
+        source_type = 'image'
+    elif ext in vid_ext_list:
+        source_type = 'video'
+    else:
+        print(f'File extension {ext} not supported.')
+        sys.exit(0)
+else:
+    print(f'Input {img_source} is invalid.')
+    sys.exit(0)
 
-if __name__ == "__main__":
-    start_monitoring()
+# Parse resolution
+resize = False
+if user_res:
+    resize = True
+    resW, resH = map(int, user_res.split('x'))
+
+# Prepare output directory
+os.makedirs(output_dir, exist_ok=True)
+
+# Load image list
+if source_type == 'image':
+    imgs_list = [img_source]
+elif source_type == 'folder':
+    imgs_list = [f for f in glob.glob(img_source + '/*') if os.path.splitext(f)[1] in img_ext_list]
+
+# Colors for bounding boxes
+bbox_colors = [(164,120,87), (68,148,228), (93,97,209), (178,182,133), (88,159,106), 
+              (96,202,231), (159,124,168), (169,162,241), (98,118,150), (172,176,184)]
+
+# Process each image
+for idx, img_filename in enumerate(imgs_list):
+    t_start = time.perf_counter()
+
+    frame = cv2.imread(img_filename)
+    if frame is None:
+        print(f"Could not load {img_filename}, skipping...")
+        continue
+
+    if resize:
+        frame = cv2.resize(frame, (resW, resH))
+
+    # Run inference
+    results = model(frame, verbose=False)
+    detections = results[0].boxes
+
+    object_count = 0
+    for det in detections:
+        xyxy = det.xyxy.cpu().numpy().squeeze().astype(int)
+        xmin, ymin, xmax, ymax = xyxy
+        classidx = int(det.cls.item())
+        classname = labels[classidx]
+        conf = det.conf.item()
+
+        if conf > min_thresh:
+            color = bbox_colors[classidx % 10]
+            cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), color, 2)
+
+            label = f'{classname}: {int(conf*100)}%'
+            labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
+            label_ymin = max(ymin, labelSize[1] + 10)
+            cv2.rectangle(frame, (xmin, label_ymin-labelSize[1]-10),
+                          (xmin+labelSize[0], label_ymin+baseLine-10), color, cv2.FILLED)
+            cv2.putText(frame, label, (xmin, label_ymin-7),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,0), 1)
+
+            object_count += 1
+
+    cv2.putText(frame, f'Objects: {object_count}', (10,40),
+                cv2.FONT_HERSHEY_SIMPLEX, .7, (0,255,255), 2)
+
+    # Save result
+    save_path = os.path.join(output_dir, f"result_{idx+1}.png")
+    cv2.imwrite(save_path, frame)
+    print(f"Saved: {save_path}")
+
+    # FPS calculation (optional)
+    t_stop = time.perf_counter()
+    fps = 1 / (t_stop - t_start)
+    print(f"Processed {img_filename} | Objects: {object_count} | FPS: {fps:.2f}")
+
+print("✅ Processing complete. All results saved.")
