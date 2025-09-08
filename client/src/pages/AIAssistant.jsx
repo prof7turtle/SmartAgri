@@ -8,9 +8,12 @@ import {
 import { useAppContext } from '../context/AppContext';
 import { fetchFieldData } from '../services/dataService';
 
-// Groq API key - Free developer key (replace with environment variable in production)
-const GROQ_API_KEY = "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";
-const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+// Groq API Configuration - Using environment variables for secure key storage
+const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
+const GROQ_API_URL = import.meta.env.VITE_GROQ_API_URL || "https://api.groq.com/openai/v1/chat/completions";
+
+// Log availability of API key (not the actual key) for debugging
+console.log("Groq API key available:", !!GROQ_API_KEY);
 
 const AIAssistant = () => {
   const { selectedField, fields } = useAppContext();
@@ -221,7 +224,7 @@ const AIAssistant = () => {
         
       // Prepare the request payload
       const payload = {
-        model: "llama3-8b-8192",  // Using Llama 3 8B model
+        model: "llama-3.3-70b-versatile",  // Updated to currently available model (Sep 2025)
         messages: [
           { role: "system", content: prompt },
           ...recentMessages,
@@ -242,19 +245,48 @@ const AIAssistant = () => {
       });
       
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error calling Groq API');
+        // Try to parse error response as JSON
+        let errorMessage = 'Error calling Groq API';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error?.message || errorData.message || errorMessage;
+        } catch (e) {
+          // If not JSON, get text
+          const errorText = await response.text();
+          errorMessage = errorText || errorMessage;
+        }
+        console.error("API Error Response:", errorMessage);
+        throw new Error(errorMessage);
       }
       
       const data = await response.json();
+      
+      // Validate response format
+      if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+        throw new Error('Unexpected response format from Groq API');
+      }
+      
       return {
         text: data.choices[0].message.content,
         icon: categoryIcons[category]
       };
     } catch (error) {
       console.error("Error calling Groq API:", error);
+      
+      // Provide more specific error message if possible
+      let errorMsg = "I'm having trouble connecting to my knowledge base at the moment. Please try again later or ask another question.";
+      
+      // Handle specific known errors
+      if (error.message.includes("decommissioned") || error.message.includes("deprecated")) {
+        errorMsg += " (Error: The AI model being used is no longer available. Our team has been notified.)";
+      } else if (error.message.includes("API key")) {
+        errorMsg += " (Error: There seems to be an issue with API authentication. Our team has been notified.)";
+      } else if (error.message.includes("rate limit")) {
+        errorMsg += " (Error: We've reached our usage limit. Please try again in a few minutes.)";
+      }
+      
       return {
-        text: "I'm having trouble connecting to my knowledge base at the moment. Please try again later or ask another question.",
+        text: errorMsg,
         icon: faSeedling
       };
     }

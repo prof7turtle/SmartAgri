@@ -620,15 +620,15 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                     to="/ai-assistant"
                     className={`flex items-center px-3 py-2.5 rounded-lg ${isCollapsed ? 'justify-center' : ''} ${
                       isActive('/ai-assistant') 
-                        ? 'bg-blue-100 text-blue-800 font-medium' 
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-blue-100 text-blue-800 font-medium rounded-lg' 
+                        : 'text-gray-700 hover:bg-gray-100 rounded-lg'
                     } group transition-colors duration-150`}
                   >
                     <FontAwesomeIcon
                       icon={faRobot}
                       className={`w-5 h-5 ${isActive('/ai-assistant') ? 'text-blue-600' : 'text-gray-500 group-hover:text-gray-900'}`}
                     />
-                    {!isCollapsed && <span className="ml-3 whitespace-nowrap">AI Assistant</span>}
+                    {!isCollapsed && <span className="ml-3 whitespace-nowrap ">AI Assistant</span>}
                   </Link>
                 </li>
               </ul>
