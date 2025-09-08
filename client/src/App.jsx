@@ -20,9 +20,9 @@ function App() {
             <Route path="/farm-console" element={<FarmConsole />} />
             <Route path="/reports" element={<h1>Reports Page (Coming Soon)</h1>} />
             <Route path="/ai-assistant" element={<AIAssistant />} />
-            <Route path="/vegetation" element={<VegetationAnalysis />} />
             <Route path="/soil" element={<SoilLandAnalysis />} />
-            <Route path="/monsoon" element={<WaterIrrigationAnalysis />} />
+            <Route path="/vegetation" element={<VegetationAnalysis />} />
+            <Route path="/monsoon" element={<WaterIrrigationAnalysis dateRange={{startDate: '2025-01-01', endDate: '2025-09-01'}} />} />
             <Route path="*" element={<h1>Page Not Found</h1>} />
           </Routes>
         </Layout>

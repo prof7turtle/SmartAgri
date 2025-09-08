@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faDroplet,
@@ -7,14 +7,33 @@ import {
   faTable,
   faLeaf,
   faChartLine,
-  faFlask
+  faFlask,
+  faWater,
+  faMapMarkerAlt,
+  faTint
 } from '@fortawesome/free-solid-svg-icons';
+import { Chart as ChartJS, LineElement, PointElement, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { Line, Bar } from 'react-chartjs-2';
 import { useAppContext } from '../../context/AppContext';
 import { fetchWaterData } from '../../services/climateService';
 import Papa from 'papaparse';
 
-const WaterIrrigationAnalysis = ({ dateRange, loading, setLoading }) => {
+// Register ChartJS components
+ChartJS.register(
+  LineElement,
+  PointElement, 
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
+
+const WaterIrrigationAnalysis = ({ dateRange }) => {
+  // Fix 3: Define loading state here instead of receiving as props
+  const [loading, setLoading] = useState(false);
   const { selectedField, selectedLocation } = useAppContext();
   const [waterData, setWaterData] = useState({
     soilMoisture: [],
@@ -46,9 +65,27 @@ const WaterIrrigationAnalysis = ({ dateRange, loading, setLoading }) => {
     }
   });
   
+  // Fix 2: Add refs for chart instances to properly clean up
+  const soilMoistureChartRef = useRef(null);
+  const waterIndicesChartRef = useRef(null);
+  const nutrientsChartRef = useRef(null);
+  
   useEffect(() => {
     loadWaterData();
     loadWaterIndicesFromCsv();
+    
+    // Cleanup function to destroy chart instances when unmounting
+    return () => {
+      if (soilMoistureChartRef.current) {
+        soilMoistureChartRef.current.destroy();
+      }
+      if (waterIndicesChartRef.current) {
+        waterIndicesChartRef.current.destroy();
+      }
+      if (nutrientsChartRef.current) {
+        nutrientsChartRef.current.destroy();
+      }
+    };
   }, [selectedField, selectedLocation, dateRange]);
   
   const loadWaterData = async () => {
@@ -112,13 +149,21 @@ const WaterIrrigationAnalysis = ({ dateRange, loading, setLoading }) => {
     }
   };
   
-  // Generic chart options
-  const getChartOptions = (title) => ({
+  // Enhanced chart options with improved UI
+  const getChartOptions = (title, customOptions = {}) => ({
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'top',
+        labels: {
+          padding: 15,
+          usePointStyle: true,
+          pointStyle: 'circle',
+          font: {
+            size: 11
+          }
+        }
       },
       title: {
         display: true,
@@ -126,28 +171,97 @@ const WaterIrrigationAnalysis = ({ dateRange, loading, setLoading }) => {
         font: {
           size: 16,
           weight: 'bold'
+        },
+        padding: {
+          top: 10,
+          bottom: 20
         }
       },
       tooltip: {
         mode: 'index',
         intersect: false,
+        backgroundColor: 'rgba(255,255,255,0.9)',
+        titleColor: '#333',
+        bodyColor: '#666',
+        titleFont: {
+          weight: 'bold',
+          size: 13
+        },
+        bodyFont: {
+          size: 12
+        },
+        borderColor: 'rgba(0,0,0,0.1)',
+        borderWidth: 1,
+        padding: 10,
+        boxPadding: 5,
+        cornerRadius: 4,
+        displayColors: true,
+        callbacks: {
+          label: function(context) {
+            const label = context.dataset.label || '';
+            const value = context.parsed.y !== null ? context.parsed.y.toFixed(3) : 'N/A';
+            return `${label.split(' - ')[0]}: ${value}`;
+          }
+        }
       }
     },
     scales: {
       x: {
         title: {
           display: true,
-          text: 'Date'
+          text: 'Date',
+          font: {
+            weight: 'bold',
+            size: 12
+          },
+          padding: {
+            top: 10
+          }
+        },
+        grid: {
+          display: true,
+          color: 'rgba(0,0,0,0.05)'
+        },
+        ticks: {
+          maxRotation: 45,
+          minRotation: 45
         }
       },
       y: {
-        beginAtZero: false
+        beginAtZero: customOptions.beginAtZero !== undefined ? customOptions.beginAtZero : false,
+        title: {
+          display: true,
+          text: customOptions.yAxisTitle || 'Value',
+          font: {
+            weight: 'bold',
+            size: 12
+          },
+          padding: {
+            bottom: 10
+          }
+        },
+        grid: {
+          display: true,
+          color: 'rgba(0,0,0,0.05)'
+        }
       }
     },
     interaction: {
       mode: 'nearest',
       axis: 'x',
       intersect: false
+    },
+    animation: {
+      duration: 1000,
+      easing: 'easeOutQuart'
+    },
+    elements: {
+      line: {
+        borderWidth: 2
+      },
+      point: {
+        hitRadius: 8
+      }
     }
   });
   
@@ -167,7 +281,7 @@ const WaterIrrigationAnalysis = ({ dateRange, loading, setLoading }) => {
     ]
   };
   
-  // Generate chart data for water indices
+  // Generate chart data for water indices with enhanced visualization
   const formatDate = (dateString) => {
     try {
       return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
@@ -177,35 +291,51 @@ const WaterIrrigationAnalysis = ({ dateRange, loading, setLoading }) => {
     }
   };
   
-  const getWaterIndicesChartData = (indices) => {
+  const getWaterIndicesChartData = (indices = waterIndices) => {
+    // Enhanced color map with more visually distinct colors
     const colorMap = {
       ndwi: {
-        border: 'rgb(54, 162, 235)',
-        background: 'rgba(54, 162, 235, 0.2)'
+        border: 'rgb(25, 118, 210)',  // Deep blue
+        background: 'rgba(25, 118, 210, 0.1)',
+        pointBgColor: 'rgb(25, 118, 210)',
+        pointBorderColor: 'white',
+        dashed: false
       },
       ndmi: {
-        border: 'rgb(75, 192, 192)',
-        background: 'rgba(75, 192, 192, 0.2)'
+        border: 'rgb(56, 142, 60)',  // Forest green
+        background: 'rgba(56, 142, 60, 0.1)',
+        pointBgColor: 'rgb(56, 142, 60)',
+        pointBorderColor: 'white',
+        dashed: false
       },
       awei: {
-        border: 'rgb(153, 102, 255)',
-        background: 'rgba(153, 102, 255, 0.2)'
+        border: 'rgb(123, 31, 162)',  // Purple
+        background: 'rgba(123, 31, 162, 0.1)',
+        pointBgColor: 'rgb(123, 31, 162)',
+        pointBorderColor: 'white',
+        dashed: false
       },
       sarwi: {
-        border: 'rgb(255, 159, 64)',
-        background: 'rgba(255, 159, 64, 0.2)'
+        border: 'rgb(255, 111, 0)',  // Deep orange
+        background: 'rgba(255, 111, 0, 0.1)',
+        pointBgColor: 'rgb(255, 111, 0)',
+        pointBorderColor: 'white',
+        dashed: true  // Use dashed line for better distinction
       },
       ewi: {
-        border: 'rgb(255, 99, 132)',
-        background: 'rgba(255, 99, 132, 0.2)'
+        border: 'rgb(211, 47, 47)',  // Deep red
+        background: 'rgba(211, 47, 47, 0.1)',
+        pointBgColor: 'rgb(211, 47, 47)',
+        pointBorderColor: 'white',
+        dashed: true  // Use dashed line for better distinction
       }
     };
     
     // Find all dates from all indices
     const allDates = new Set();
-    Object.values(indices)
-      .filter(dataset => Array.isArray(dataset))
-      .forEach(dataset => {
+    Object.entries(indices)
+      .filter(([key, value]) => key !== 'loading' && Array.isArray(value) && value.length > 0)
+      .forEach(([_, dataset]) => {
         dataset.forEach(item => {
           if (item.date) allDates.add(item.date);
         });
@@ -214,53 +344,109 @@ const WaterIrrigationAnalysis = ({ dateRange, loading, setLoading }) => {
     const sortedDates = [...allDates].sort((a, b) => new Date(a) - new Date(b));
     const labels = sortedDates.map(date => formatDate(date));
     
-    // Create datasets for each index
+    // Create datasets for each index with enhanced visualization properties
     const datasets = [];
     
-    Object.entries(indices)
-      .filter(([key]) => key !== 'loading' && Array.isArray(indices[key]) && indices[key].length > 0)
-      .forEach(([key, data]) => {
-        // Create a map of date to value for quick lookup
-        const dateValueMap = {};
-        data.forEach(item => {
-          dateValueMap[item.date] = item.value;
+    // Define display names and ensure normalized ranges for better comparison
+    const indexDefinitions = {
+      ndwi: { 
+        label: 'NDWI - Water Index',
+        description: 'Surface water detection',
+        order: 1
+      },
+      ndmi: { 
+        label: 'NDMI - Moisture Index',
+        description: 'Vegetation moisture content',
+        order: 2
+      },
+      awei: { 
+        label: 'AWEI - Water Extraction',
+        description: 'Enhanced water extraction',
+        order: 3
+      },
+      sarwi: { 
+        label: 'SARWI - Radar-based Index',
+        description: 'Radar water detection',
+        order: 4
+      },
+      ewi: { 
+        label: 'EWI - Enhanced Wetness',
+        description: 'Improved wetness detection',
+        order: 5
+      }
+    };
+    
+    // Process each index type
+    const processedIndices = Object.entries(indices)
+      .filter(([key, value]) => key !== 'loading' && Array.isArray(value) && value.length > 0)
+      .sort(([keyA], [keyB]) => {
+        // Sort by defined order to ensure consistent legend display
+        return (indexDefinitions[keyA]?.order || 99) - (indexDefinitions[keyB]?.order || 99);
+      });
+      
+    processedIndices.forEach(([key, data]) => {
+      // Create a map of date to value for quick lookup
+      const dateValueMap = {};
+      data.forEach(item => {
+        // Ensure we have valid numeric values
+        if (item.date && !isNaN(parseFloat(item.value))) {
+          dateValueMap[item.date] = parseFloat(item.value);
+        }
+      });
+      
+      // Only include datasets that actually have values
+      if (Object.keys(dateValueMap).length > 0) {
+        // For each date, get the value or null
+        const values = sortedDates.map(date => {
+          const value = dateValueMap[date];
+          return value !== undefined ? value : null;
         });
         
-        // For each date, get the value or null
-        const values = sortedDates.map(date => dateValueMap[date] || null);
+        // Get index information
+        const indexInfo = indexDefinitions[key] || { 
+          label: key.toUpperCase(), 
+          description: 'Water/moisture index'
+        };
         
-        let label;
-        switch(key) {
-          case 'ndwi':
-            label = 'NDWI - Normalized Difference Water Index';
-            break;
-          case 'ndmi':
-            label = 'NDMI - Normalized Difference Moisture Index';
-            break;
-          case 'awei':
-            label = 'AWEI - Automated Water Extraction Index';
-            break;
-          case 'sarwi':
-            label = 'SARWI - Modified Normalized Difference';
-            break;
-          case 'ewi':
-            label = 'EWI - Enhanced Wetness Index';
-            break;
-          default:
-            label = key.toUpperCase();
-        }
-        
+        // Create enhanced dataset with proper styling
         datasets.push({
-          label: label,
+          label: indexInfo.label,
           data: values,
           borderColor: colorMap[key].border,
           backgroundColor: colorMap[key].background,
-          borderWidth: 2,
+          borderWidth: 3,
           fill: false,
           tension: 0.4,
-          pointRadius: 3
+          pointRadius: 5,
+          pointStyle: 'circle',
+          pointBackgroundColor: colorMap[key].pointBgColor,
+          pointBorderColor: colorMap[key].pointBorderColor,
+          pointBorderWidth: 1.5,
+          pointHoverRadius: 8,
+          pointHoverBackgroundColor: colorMap[key].pointBgColor,
+          pointHoverBorderColor: 'white',
+          pointHoverBorderWidth: 2,
+          borderDash: colorMap[key].dashed ? [5, 5] : undefined,
+          borderCapStyle: 'round',
+          borderJoinStyle: 'round',
+          spanGaps: true, // Connect lines across missing data points
+          clip: 5,
+          order: indexInfo.order || 1
         });
+      }
+    });
+    
+    // If no datasets were created, create a placeholder dataset
+    if (datasets.length === 0) {
+      datasets.push({
+        label: 'No Data Available',
+        data: sortedDates.map(() => null),
+        borderColor: 'rgb(200, 200, 200)',
+        backgroundColor: 'rgba(200, 200, 200, 0.1)',
+        borderWidth: 2,
+        fill: false
       });
+    }
     
     return {
       labels,
@@ -268,7 +454,8 @@ const WaterIrrigationAnalysis = ({ dateRange, loading, setLoading }) => {
     };
   };
   
-  const waterIndicesChartData = getWaterIndicesChartData(waterIndices);
+  // Generate the chart data directly during component render for fresh data
+  const waterIndicesChartData = getWaterIndicesChartData();
   
   // Generate chart data for nutrients
   const nutrientsChartData = {
@@ -299,6 +486,27 @@ const WaterIrrigationAnalysis = ({ dateRange, loading, setLoading }) => {
     ]
   };
 
+  // Helper function to get status color
+  const getStatusColor = (status) => {
+    switch(status.toLowerCase()) {
+      case 'good':
+      case 'optimal':
+      case 'high':
+      case 'adequate':
+        return 'bg-green-100 text-green-800';
+      case 'moderate':
+      case 'normal':
+        return 'bg-blue-100 text-blue-800';
+      case 'low':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'critical':
+      case 'poor':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   return (
     <div className="Analytics">
       <div className="mb-6">
@@ -318,16 +526,34 @@ const WaterIrrigationAnalysis = ({ dateRange, loading, setLoading }) => {
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Soil Moisture Chart */}
-          <div className="bg-white p-4 rounded-lg shadow">
+          {/* Soil Moisture Chart - Enhanced UI */}
+          <div className="bg-white p-5 rounded-lg shadow-lg border border-gray-100">
+            <div className="flex items-center mb-4">
+              <span className="text-blue-600 mr-3">
+                <FontAwesomeIcon icon={faTint} size="lg" />
+              </span>
+              <h3 className="text-lg font-semibold">Soil Moisture Trends</h3>
+            </div>
             <div className="h-80">
-              <Line data={soilMoistureChartData} options={getChartOptions('Soil Moisture')} />
+              <Line 
+                data={soilMoistureChartData} 
+                options={getChartOptions('Soil Moisture Over Time', {
+                  yAxisTitle: 'Moisture (%)',
+                  beginAtZero: true
+                })} 
+                ref={soilMoistureChartRef} 
+              />
             </div>
           </div>
           
-          {/* Irrigation Recommendations */}
-          <div className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-lg font-semibold mb-3">Irrigation Recommendations</h3>
+          {/* Irrigation Recommendations - Enhanced UI */}
+          <div className="bg-white p-5 rounded-lg shadow-lg border border-gray-100">
+            <div className="flex items-center mb-4">
+              <span className="text-green-600 mr-3">
+                <FontAwesomeIcon icon={faWater} size="lg" />
+              </span>
+              <h3 className="text-lg font-semibold">Irrigation Recommendations</h3>
+            </div>
             
             <div className="space-y-4">
               {waterData.recommendations?.map((recommendation, index) => (
@@ -360,9 +586,252 @@ const WaterIrrigationAnalysis = ({ dateRange, loading, setLoading }) => {
             </div>
           </div>
           
-          {/* Irrigation History */}
-          <div className="bg-white p-4 rounded-lg shadow lg:col-span-2">
-            <h3 className="text-lg font-semibold mb-3">Irrigation History</h3>
+          {/* Water Indices Chart - Enhanced UI */}
+          <div className="bg-white p-5 rounded-lg shadow-lg border border-gray-100 lg:col-span-2">
+            <h3 className="text-lg font-semibold mb-3 flex items-center">
+              <FontAwesomeIcon icon={faChartLine} className="text-blue-600 mr-2" />
+              Water Indices Analysis
+            </h3>
+            
+            <div className="mb-4 p-4 bg-blue-50 rounded-lg text-sm border-l-4 border-blue-400">
+              <h4 className="font-semibold mb-2 text-blue-800">About Water Indices</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="p-2 bg-white rounded shadow-sm">
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full bg-[rgb(25,118,210)] mr-2"></div>
+                    <span className="font-bold text-gray-800">NDWI</span>
+                  </div>
+                  <p className="mt-1 text-gray-600">Normalized Difference Water Index - Detects surface water content</p>
+                </div>
+                <div className="p-2 bg-white rounded shadow-sm">
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full bg-[rgb(56,142,60)] mr-2"></div>
+                    <span className="font-bold text-gray-800">NDMI</span>
+                  </div>
+                  <p className="mt-1 text-gray-600">Normalized Difference Moisture Index - Measures vegetation moisture</p>
+                </div>
+                <div className="p-2 bg-white rounded shadow-sm">
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full bg-[rgb(123,31,162)] mr-2"></div>
+                    <span className="font-bold text-gray-800">AWEI</span>
+                  </div>
+                  <p className="mt-1 text-gray-600">Automated Water Extraction Index - Enhanced water body detection</p>
+                </div>
+                <div className="p-2 bg-white rounded shadow-sm">
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full bg-[rgb(255,111,0)] mr-2"></div>
+                    <span className="font-bold text-gray-800">SARWI</span>
+                  </div>
+                  <p className="mt-1 text-gray-600">Radar-based Water Index - Uses radar for water mapping</p>
+                </div>
+                <div className="p-2 bg-white rounded shadow-sm">
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full bg-[rgb(211,47,47)] mr-2"></div>
+                    <span className="font-bold text-gray-800">EWI</span>
+                  </div>
+                  <p className="mt-1 text-gray-600">Enhanced Wetness Index - Improved wetness detection accuracy</p>
+                </div>
+                <div className="p-2 bg-white rounded shadow-sm">
+                  <div className="flex items-center">
+                    <FontAwesomeIcon icon={faInfoCircle} className="text-blue-500 mr-2" />
+                    <span className="font-bold text-gray-800">Interpretation</span>
+                  </div>
+                  <p className="mt-1 text-gray-600">Higher values generally indicate more water content/moisture</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="h-96">
+              {waterIndices.loading ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="spinner border-t-4 border-blue-500 border-solid rounded-full w-10 h-10 animate-spin"></div>
+                </div>
+              ) : (
+                <Line 
+                  data={waterIndicesChartData} 
+                  options={getChartOptions('Water Indices Over Time', {
+                    yAxisTitle: 'Index Value',
+                    beginAtZero: false
+                  })} 
+                  ref={waterIndicesChartRef} 
+                />
+              )}
+            </div>
+            
+            <div className="mt-3 bg-gray-50 p-3 rounded-md text-xs text-gray-600 flex items-center">
+              <FontAwesomeIcon icon={faInfoCircle} className="text-blue-500 mr-2" />
+              <span>Indices are calculated from multispectral satellite imagery and updated weekly.</span>
+            </div>
+          </div>
+          
+          {/* Key Observations - Enhanced UI */}
+          <div className="bg-white p-5 rounded-lg shadow-lg border border-gray-100">
+            <div className="flex items-center mb-4">
+              <span className="text-green-600 mr-3">
+                <FontAwesomeIcon icon={faLeaf} size="lg" />
+              </span>
+              <h3 className="text-lg font-semibold">Key Observations</h3>
+            </div>
+            
+            <div className="space-y-4">
+              {/* Health Status */}
+              <div>
+                <div className="flex justify-between mb-1">
+                  <span className="text-sm font-medium">Health</span>
+                  <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(keyObservations.health.status)}`}>
+                    {keyObservations.health.status}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div 
+                    className="bg-green-500 h-2.5 rounded-full" 
+                    style={{ width: `${keyObservations.health.value}%` }}
+                  ></div>
+                </div>
+              </div>
+              
+              {/* Stress */}
+              <div>
+                <div className="flex justify-between mb-1">
+                  <span className="text-sm font-medium">Stress</span>
+                  <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(keyObservations.stress.status)}`}>
+                    {keyObservations.stress.status}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div 
+                    className="bg-yellow-500 h-2.5 rounded-full" 
+                    style={{ width: `${keyObservations.stress.value}%` }}
+                  ></div>
+                </div>
+              </div>
+              
+              {/* Aging */}
+              <div>
+                <div className="flex justify-between mb-1">
+                  <span className="text-sm font-medium">Aging</span>
+                  <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(keyObservations.aging.status)}`}>
+                    {keyObservations.aging.status}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div 
+                    className="bg-blue-500 h-2.5 rounded-full" 
+                    style={{ width: `${keyObservations.aging.value}%` }}
+                  ></div>
+                </div>
+              </div>
+              
+              {/* Chlorophyll */}
+              <div>
+                <div className="flex justify-between mb-1">
+                  <span className="text-sm font-medium">Chlorophyll</span>
+                  <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(keyObservations.chlorophyll.status)}`}>
+                    {keyObservations.chlorophyll.status}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div 
+                    className="bg-green-500 h-2.5 rounded-full" 
+                    style={{ width: `${keyObservations.chlorophyll.value}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Nutrients Content - Enhanced UI */}
+          <div className="bg-white p-5 rounded-lg shadow-lg border border-gray-100">
+            <div className="flex items-center mb-4">
+              <span className="text-amber-600 mr-3">
+                <FontAwesomeIcon icon={faFlask} size="lg" />
+              </span>
+              <h3 className="text-lg font-semibold">Nutrients Content</h3>
+            </div>
+            
+            <div className="h-60 mb-4">
+              <Bar 
+                data={nutrientsChartData} 
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: {
+                      display: false
+                    },
+                    title: {
+                      display: false
+                    }
+                  },
+                  scales: {
+                    y: {
+                      beginAtZero: true
+                    }
+                  }
+                }} 
+                ref={nutrientsChartRef}
+              />
+            </div>
+            
+            <div className="overflow-x-auto mt-4">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nutrients</th>
+                    <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Value</th>
+                    <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  <tr>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">Nitrogen</td>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm text-center text-gray-900">{keyObservations.nutrients.nitrogen.value}</td>
+                    <td className="px-4 py-2 whitespace-nowrap text-center">
+                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(keyObservations.nutrients.nitrogen.status)}`}>
+                        {keyObservations.nutrients.nitrogen.status}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">Phosphorus</td>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm text-center text-gray-900">{keyObservations.nutrients.phosphorus.value}</td>
+                    <td className="px-4 py-2 whitespace-nowrap text-center">
+                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(keyObservations.nutrients.phosphorus.status)}`}>
+                        {keyObservations.nutrients.phosphorus.status}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">Potassium</td>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm text-center text-gray-900">{keyObservations.nutrients.potassium.value}</td>
+                    <td className="px-4 py-2 whitespace-nowrap text-center">
+                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(keyObservations.nutrients.potassium.status)}`}>
+                        {keyObservations.nutrients.potassium.status}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">Magnesium</td>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm text-center text-gray-900">{keyObservations.nutrients.magnesium.value}</td>
+                    <td className="px-4 py-2 whitespace-nowrap text-center">
+                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(keyObservations.nutrients.magnesium.status)}`}>
+                        {keyObservations.nutrients.magnesium.status}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          {/* Irrigation History - Enhanced UI */}
+          <div className="bg-white p-5 rounded-lg shadow-lg border border-gray-100 lg:col-span-2">
+            <div className="flex items-center mb-4">
+              <span className="text-gray-600 mr-3">
+                <FontAwesomeIcon icon={faTable} size="lg" />
+              </span>
+              <h3 className="text-lg font-semibold">Irrigation History</h3>
+            </div>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead>
@@ -414,9 +883,14 @@ const WaterIrrigationAnalysis = ({ dateRange, loading, setLoading }) => {
             </div>
           </div>
           
-          {/* Water Efficiency Metrics */}
-          <div className="bg-white p-4 rounded-lg shadow lg:col-span-2">
-            <h3 className="text-lg font-semibold mb-4">Water Efficiency Metrics</h3>
+          {/* Water Efficiency Metrics - Enhanced UI */}
+          <div className="bg-white p-5 rounded-lg shadow-lg border border-gray-100 lg:col-span-2">
+            <div className="flex items-center mb-4">
+              <span className="text-blue-600 mr-3">
+                <FontAwesomeIcon icon={faDroplet} size="lg" />
+              </span>
+              <h3 className="text-lg font-semibold">Water Efficiency Metrics</h3>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="p-4 bg-blue-50 rounded-md">
                 <div className="text-sm text-gray-600 mb-1">Water Use Efficiency</div>
