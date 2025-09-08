@@ -101,12 +101,14 @@ export const AppProvider = ({ children }) => {
     if (fieldId) {
       updateManipalCoordinates(fieldId)
         .then(result => {
-          if (!result.success) {
+          if (!result.success && !result.offline) {
             console.warn('Failed to update manipal.json:', result.message);
+          } else if (result.offline) {
+            console.log('Operating in offline mode - manipal.json update skipped');
           }
         })
         .catch(error => {
-          console.error('Error in updating manipal.json:', error);
+          console.warn('Error in updating manipal.json:', error.message);
         });
     }
   };
