@@ -460,7 +460,7 @@ const Dashboard = () => {
           {/* Additional Information Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Alerts and Notifications Card */}
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-shadow">
+            {/* <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-shadow">
               <div className="border-b border-gray-50 bg-gradient-to-r from-amber-50 to-amber-100 py-4 px-6">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold text-gray-800 flex items-center">
@@ -522,10 +522,10 @@ const Dashboard = () => {
                   <FontAwesomeIcon icon={faChevronDown} className="ml-2 w-4 h-4" />
                 </button>
               </div>
-            </div>
+            </div> */}
             
             {/* Recent Activity Card */}
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-shadow">
+            {/* <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-shadow">
               <div className="border-b border-gray-50 bg-gradient-to-r from-gray-50 to-gray-100 py-4 px-6">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold text-gray-800 flex items-center">
@@ -597,7 +597,7 @@ const Dashboard = () => {
                   <FontAwesomeIcon icon={faChevronDown} className="ml-2 w-4 h-4" />
                 </button>
               </div>
-            </div>
+            </div> */}
           </div>
         </>
       )}

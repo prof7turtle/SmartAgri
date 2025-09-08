@@ -529,7 +529,7 @@ const AIAssistant = () => {
       </div>
       
       {/* Suggested questions */}
-      {suggestedQuestions.length > 0 && !isLoading && (
+      {/* {suggestedQuestions.length > 0 && !isLoading && (
         <div className="bg-white px-6 py-3 border-t border-gray-100">
           <div className="max-w-3xl mx-auto">
             <p className="text-xs text-gray-500 mb-2 font-medium">SUGGESTED QUESTIONS:</p>
@@ -546,7 +546,7 @@ const AIAssistant = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
       
       {/* Input area */}
       <div className="p-4 md:p-5 bg-white border-t border-gray-200 shadow-inner">
