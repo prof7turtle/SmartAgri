@@ -66,13 +66,12 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="fixed top-0 z-50 w-full bg-white border-b border-gray-200">
-        <div className="px-3 py-3 lg:px-5">
-          <div className="flex items-center justify-between">
-            {/* Logo/Brand */}
-            <Link to="/" className="text-xl font-bold text-green-800 whitespace-nowrap">
+      <nav style={{height: "50px", alignContent: "center"}} className="fixed top-0 z-50 w-full bg-[#192a06] border-b border-gray-200">
+        <div className="lg:px-3">
+          <div className="flex items-center justify-between">            
+            <Link to="/" style={{fontSize: "25px"}} className="text-xl  text-white whitespace-nowrap">
               Smart Agriculture
-            </Link>
+            </Link> 
             
             {/* Mobile menu button */}
             <button 
@@ -86,21 +85,22 @@ const Navbar = () => {
             <div className="hidden md:flex items-center space-x-4 flex-grow mx-4">
               {/* Search Bar */}
               <div className="flex-grow max-w-md">
-                <form onSubmit={handleSearch} className="relative flex items-center border rounded-md px-3 py-1.5">
+                <form onSubmit={handleSearch} style={{borderRadius: "4px", height: "35px", fontSize: "20px", marginLeft: "50px", width: "500px"}} className="relative flex items-center px-3 bg-white">
                   <input 
                     type="text" 
                     id="searchInput" 
                     placeholder="Search (/) for tools, and more" 
-                    className="outline-none w-full text-sm"
+                    className="outline-none text-base"
+                    style={{ width: "100%"}}
                     autoComplete="off"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
-                  <div className="flex space-x-1 text-sm">
-                    <button type="button" className="text-green-700 hover:text-green-900">
+                  <div style={{marginLeft: "auto"}} className="flex space-x-1 text-sm">
+                    <button type="button" style={{cursor: "pointer", fontSize: "18px"}} className="text-green-700 hover:text-[#192a06]">
                       <FontAwesomeIcon icon={faMicrophone} />
                     </button>
-                    <button type="submit" className="text-green-700 hover:text-green-900">
+                    <button type="submit" style={{cursor: "pointer", fontSize: "18px"}} className="text-green-700 hover:text-[#192a06]">
                       <FontAwesomeIcon icon={faMagnifyingGlass} />
                     </button>
                   </div>
@@ -108,11 +108,12 @@ const Navbar = () => {
               </div>
               
               {/* Field Selection */}
-              <div className="relative">
+              <div style={{marginRight: "auto", marginLeft: "110px"}} className="relative">
                 <select
                   name="Select Field"
                   id="selectField"
-                  className="border rounded px-3 py-1.5 bg-white text-gray-700 appearance-none pr-8 cursor-pointer"
+                  style={{height: "37px"}}
+                  className="border rounded px-3 bg-white text-gray-700 appearance-none cursor-pointer"
                   onChange={handleFieldChange}
                   value={selectedField || ''}
                 >
@@ -128,9 +129,9 @@ const Navbar = () => {
               </div>
               
               {/* Navigation Buttons */}
-              <button 
+              {/* <button 
                 onClick={navigateToClimateAnalysis} 
-                className={`bg-white border rounded px-3 py-1.5 font-medium transition-colors ${location.pathname === '/climate' ? 'bg-green-100 text-green-800 border-green-500' : 'text-gray-700 hover:bg-gray-100'}`}
+                className={`bg-white border rounded px-3 py-1.5 font-medium h-8.5 transition-colors ${location.pathname === '/climate' ? 'bg-green-100 text-green-800 border-green-500' : 'text-gray-700 hover:bg-gray-100'}`}
               >
                 Climate Analysis
               </button>
@@ -140,7 +141,7 @@ const Navbar = () => {
                 className={`bg-white border rounded px-3 py-1.5 font-medium transition-colors ${location.pathname === '/farm-console' ? 'bg-green-100 text-green-800 border-green-500' : 'text-gray-700 hover:bg-gray-100'}`}
               >
                 Farm Console
-              </button>
+              </button> */}
             </div>
             
             {/* Location Selector - Desktop */}
@@ -150,7 +151,8 @@ const Navbar = () => {
                 id="location" 
                 name="location" 
                 placeholder="Location 📍" 
-                className="border rounded px-3 py-1.5"
+                style={{height: "37px"}}
+                className="border rounded px-3 py-1.5 bg-white pr-0"
                 value={selectedLocation}
                 onChange={handleLocationChange}
               />
