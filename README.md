@@ -261,11 +261,9 @@ const handleSetSelectedField = (fieldId) => {
 
 Our interdisciplinary team combines expertise in agricultural science, remote sensing, software development, and UI/UX design:
 
-- **Sujal Pawar** - Team Lead & Full-Stack Developer
-- **Team Member 2** - Agricultural Data Scientist
 - **Team Member 3** - Remote Sensing Specialist
 - **Team Member 4** - UI/UX Designer
-- **Team Member 5** - Backend Developer
+- **Sujal Pawar** - Full-Stack Developer
 
 ## 🙏 Acknowledgments
 
@@ -279,7 +277,6 @@ Our interdisciplinary team combines expertise in agricultural science, remote se
 ## 📬 Contact & Support
 
 For questions about this hackathon project, please contact:
-- Email: your.email@example.com
 - GitHub: [github.com/sujal-pawar](https://github.com/sujal-pawar)
 
 ## 📊 Demo & Visuals
