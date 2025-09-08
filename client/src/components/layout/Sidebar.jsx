@@ -89,18 +89,18 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
   return (
     <aside 
       id="sidebar"
-      className={`fixed top-0 left-0 z-40 h-screen pt-14 transition-all duration-300 ease-in-out bg-gradient-to-b from-green to-gray-50 border-r border-gray-200 shadow-md ${
+      className={`fixed top-0 left-0 z-40 h-screen pt-14 transition-all duration-300 ease-in-out bg-white border-r border-green-200 shadow-lg ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-      } ${isMobile ? 'w-[85vw]' : ''} ${!isMobile && isCollapsed ? 'md:w-20' : 'md:w-64'}` }
+      } ${isMobile ? 'w-[85vw] max-w-[300px]' : ''} ${!isMobile && isCollapsed ? 'md:w-20' : 'md:w-64'}` }
       aria-label="Sidebar"
     >
       <div className="h-full flex flex-col justify-between overflow-y-auto pb-20 md:pb-0 overscroll-contain scroll-smooth">
         <div>
           {/* Top section with logo & collapse button */}
-          <div className="flex items-center justify-between py-3 px-4 border-b border-gray-200 sticky top-0 bg-white bg-opacity-95 backdrop-blur-sm z-10 shadow-sm">
+          <div className="flex items-center justify-between py-3 px-4 border-b border-green-200 sticky top-0 bg-gradient-to-r from-green-600 to-green-500 bg-opacity-95 backdrop-blur-sm z-10 shadow-md">
             {!isCollapsed && (
               <div className="flex items-center space-x-2">
-                <span className="font-bold text-green-700 text-lg">Smart Agri</span>
+                <span className="font-bold text-white text-lg">Smart Agri</span>
               </div>
             )}
             
@@ -108,7 +108,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
             <button 
               onClick={toggleSidebar} 
               type="button" 
-              className={`${isCollapsed ? 'mx-auto' : ''} inline-flex items-center justify-center p-2 rounded-lg text-gray-600 hover:bg-green-50 hover:text-green-700 transition-colors`}
+              className={`${isCollapsed ? 'mx-auto' : ''} inline-flex items-center justify-center p-2 rounded-lg text-white hover:bg-green-400 hover:text-white transition-colors`}
               aria-expanded={!isCollapsed}
               aria-label="Toggle sidebar collapse"
             >
@@ -121,7 +121,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
           <nav className="mt-2">
             <div className={`px-3 py-2 ${!isCollapsed && 'mb-1'}`}>
               {!isCollapsed && (
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <h3 className="text-xs font-semibold text-green-700 uppercase tracking-wider pl-2">
                   Main
                 </h3>
               )}
@@ -131,9 +131,9 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                     to="/"
                     className={`flex items-center px-3 py-3 rounded-lg ${isCollapsed ? 'justify-center' : ''} ${
                       isActive('/') 
-                        ? 'bg-green-100 text-green-800 font-medium' 
-                        : 'text-gray-700 hover:bg-gray-100'
-                    } group transition-colors duration-150 ${isMobile ? 'active:bg-green-50' : ''}`}
+                        ? 'bg-green-100 text-green-800 font-medium shadow-sm border-l-4 border-green-600' 
+                        : 'text-gray-700 hover:bg-green-100 hover:text-green-700'
+                    } group transition-all duration-200 ${isMobile ? 'active:bg-green-100' : ''}`}
                   >
                     <FontAwesomeIcon
                       icon={faHome}
@@ -180,9 +180,9 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                     to="/crop-management"
                     className={`flex items-center px-3 py-2.5 rounded-lg ${isCollapsed ? 'justify-center' : ''} ${
                       isActive('/crop-management') 
-                        ? 'bg-green-100 text-green-800 font-medium' 
-                        : 'text-gray-700 hover:bg-gray-100'
-                    } group transition-colors duration-150`}
+                        ? 'bg-green-100 text-green-800 font-medium shadow-sm border-l-4 border-green-600' 
+                        : 'text-gray-700 hover:bg-green-100 hover:text-green-700'
+                    } group transition-all duration-200`}
                   >
                     <FontAwesomeIcon
                       icon={faWarehouse}
@@ -196,9 +196,9 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                     to="/financial-aid"
                     className={`flex items-center px-3 py-2.5 rounded-lg ${isCollapsed ? 'justify-center' : ''} ${
                       isActive('/financial-aid') 
-                        ? 'bg-green-100 text-green-800 font-medium' 
-                        : 'text-gray-700 hover:bg-gray-100'
-                    } group transition-colors duration-150`}
+                        ? 'bg-green-100 text-green-800 font-medium shadow-sm border-l-4 border-green-600' 
+                        : 'text-gray-700 hover:bg-green-100 hover:text-green-700'
+                    } group transition-all duration-200`}
                   >
                     <FontAwesomeIcon
                       icon={faHandshake}
@@ -212,7 +212,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
              {/* Field Management */}
             <div className={`px-3 py-2 ${!isCollapsed && 'mb-1'}`}>
               {!isCollapsed && (
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <h3 className="text-xs font-semibold text-green-700 uppercase tracking-wider pl-2">
                   Field Management
                 </h3>
               )}
@@ -222,7 +222,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                     type="button"
                     className={`flex items-center w-full px-3 py-2.5 rounded-lg text-left text-gray-700 ${
                       isCollapsed ? 'justify-center' : ''
-                    } hover:bg-gray-100 transition-colors duration-150`}
+                    } hover:bg-green-100 hover:text-green-700 transition-all duration-200 ${expandedMenus.fields ? 'bg-green-50 text-green-700' : ''}`}
                     onClick={() => toggleMenu('fields')}
                   >
                     <FontAwesomeIcon
@@ -247,9 +247,9 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                           to="/create-field"
                           className={`flex items-center px-3 py-2 rounded-md ${
                             isActive('/create-field') 
-                              ? 'bg-green-50 text-green-800' 
-                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                          } transition-colors duration-150`}
+                              ? 'bg-green-100 text-green-800 font-medium border-l-2 border-green-600' 
+                              : 'text-gray-600 hover:text-green-700 hover:bg-green-50'
+                          } transition-all duration-200`}
                         >
                           <FontAwesomeIcon
                             icon={faDraftingCompass}
@@ -263,9 +263,9 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                           to="/field-list"
                           className={`flex items-center px-3 py-2 rounded-md ${
                             isActive('/field-list') 
-                              ? 'bg-green-50 text-green-800' 
-                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                          } transition-colors duration-150`}
+                              ? 'bg-green-100 text-green-800 font-medium border-l-2 border-green-600' 
+                              : 'text-gray-600 hover:text-green-700 hover:bg-green-50'
+                          } transition-all duration-200`}
                         >
                           <FontAwesomeIcon
                             icon={faLocationDot}
@@ -283,7 +283,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
             {/* Analytics Sections */}
             <div className={`px-3 py-2 ${!isCollapsed && 'mb-1'}`}>
               {!isCollapsed && (
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <h3 className="text-xs font-semibold text-green-700 uppercase tracking-wider pl-2">
                   Analytics
                 </h3>
               )}
@@ -294,7 +294,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                     type="button"
                     className={`flex items-center w-full px-3 py-3 rounded-lg text-left text-gray-700 ${
                       isCollapsed ? 'justify-center' : ''
-                    } hover:bg-gray-100 transition-colors duration-150 ${isMobile ? 'active:bg-gray-50' : ''}`}
+                    } hover:bg-green-100 hover:text-green-700 transition-all duration-200 ${isMobile ? 'active:bg-green-100' : ''} ${expandedMenus.analytics ? 'bg-green-50 text-green-700' : ''}`}
                     onClick={() => toggleMenu('analytics')}
                     onKeyDown={(e) => handleKeyDown(e, 'analytics')}
                     aria-expanded={expandedMenus.analytics}
@@ -337,9 +337,9 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                           to="/vegetation"
                           className={`flex items-center px-3 py-2 rounded-md ${
                             isActive('/vegetation') 
-                              ? 'bg-green-50 text-green-800' 
-                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                          } transition-colors duration-150`}
+                              ? 'bg-green-100 text-green-800 font-medium border-l-2 border-green-600' 
+                              : 'text-gray-600 hover:text-green-700 hover:bg-green-50'
+                          } transition-all duration-200`}
                         >
                           <FontAwesomeIcon
                             icon={faLeaf}
@@ -369,9 +369,9 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                           to="/monsoon"
                           className={`flex items-center px-3 py-2 rounded-md ${
                             isActive('/monsoon') 
-                              ? 'bg-green-50 text-green-800' 
-                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                          } transition-colors duration-150`}
+                              ? 'bg-green-100 text-green-800 font-medium border-l-2 border-green-600' 
+                              : 'text-gray-600 hover:text-green-700 hover:bg-green-50'
+                          } transition-all duration-200`}
                         >
                           <FontAwesomeIcon
                             icon={faCloudRain}
@@ -406,7 +406,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                     type="button"
                     className={`flex items-center w-full px-3 py-2.5 rounded-lg text-left text-gray-700 ${
                       isCollapsed ? 'justify-center' : ''
-                    } hover:bg-gray-100 transition-colors duration-150`}
+                    } hover:bg-green-100 hover:text-green-700 transition-all duration-200 ${expandedMenus.pests ? 'bg-green-50 text-green-700' : ''}`}
                     onClick={() => toggleMenu('pests')}
                   >
                     <FontAwesomeIcon
@@ -431,9 +431,9 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                           to="/pest-monitor"
                           className={`flex items-center px-3 py-2 rounded-md ${
                             isActive('/pest-monitor') 
-                              ? 'bg-green-50 text-green-800' 
-                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                          } transition-colors duration-150`}
+                              ? 'bg-green-100 text-green-800 font-medium border-l-2 border-green-600' 
+                              : 'text-gray-600 hover:text-green-700 hover:bg-green-50'
+                          } transition-all duration-200`}
                         >
                           <FontAwesomeIcon
                             icon={faBug}
@@ -447,9 +447,9 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                           to="/pest-treatment"
                           className={`flex items-center px-3 py-2 rounded-md ${
                             isActive('/pest-treatment') 
-                              ? 'bg-green-50 text-green-800' 
-                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                          } transition-colors duration-150`}
+                              ? 'bg-green-100 text-green-800 font-medium border-l-2 border-green-600' 
+                              : 'text-gray-600 hover:text-green-700 hover:bg-green-50'
+                          } transition-all duration-200`}
                         >
                           <FontAwesomeIcon
                             icon={faSprayCan}
@@ -546,7 +546,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                     type="button"
                     className={`flex items-center w-full px-3 py-2.5 rounded-lg text-left text-gray-700 ${
                       isCollapsed ? 'justify-center' : ''
-                    } hover:bg-gray-100 transition-colors duration-150`}
+                    } hover:bg-green-100 hover:text-green-700 transition-all duration-200 ${expandedMenus.irrigation ? 'bg-green-50 text-green-700' : ''}`}
                     onClick={() => toggleMenu('irrigation')}
                   >
                     <FontAwesomeIcon
@@ -571,9 +571,9 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                           to="/water-management"
                           className={`flex items-center px-3 py-2 rounded-md ${
                             isActive('/water-management') 
-                              ? 'bg-green-50 text-green-800' 
-                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                          } transition-colors duration-150`}
+                              ? 'bg-green-100 text-green-800 font-medium border-l-2 border-green-600' 
+                              : 'text-gray-600 hover:text-green-700 hover:bg-green-50'
+                          } transition-all duration-200`}
                         >
                           <FontAwesomeIcon
                             icon={faDroplet}
@@ -610,7 +610,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
             {/* Tools */}
             <div className={`px-3 py-2 ${!isCollapsed && 'mb-1'}`}>
               {!isCollapsed && (
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <h3 className="text-xs font-semibold text-green-700 uppercase tracking-wider pl-2">
                   Tools
                 </h3>
               )}
@@ -620,9 +620,9 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                     to="/ai-assistant"
                     className={`flex items-center px-3 py-2.5 rounded-lg ${isCollapsed ? 'justify-center' : ''} ${
                       isActive('/ai-assistant') 
-                        ? 'bg-blue-100 text-blue-800 font-medium rounded-lg' 
-                        : 'text-gray-700 hover:bg-gray-100 rounded-lg'
-                    } group transition-colors duration-150`}
+                        ? 'bg-blue-100 text-blue-800 font-medium rounded-lg border-l-4 border-blue-600 shadow-sm' 
+                        : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg'
+                    } group transition-all duration-200`}
                   >
                     <FontAwesomeIcon
                       icon={faRobot}
@@ -640,7 +640,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
         <div className="mt-auto">
           <div className="px-3 py-2">
             {!isCollapsed && (
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+              <h3 className="text-xs font-semibold text-green-700 uppercase tracking-wider mb-1 pl-2">
                 Account
               </h3>
             )}
@@ -650,9 +650,9 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                   to="/profile"
                   className={`flex items-center px-3 py-2.5 rounded-lg ${isCollapsed ? 'justify-center' : ''} ${
                     isActive('/profile') 
-                      ? 'bg-gray-100 text-gray-800' 
-                      : 'text-gray-700 hover:bg-gray-100'
-                  } group transition-colors duration-150`}
+                      ? 'bg-green-100 text-green-800 font-medium border-l-4 border-green-600 shadow-sm' 
+                      : 'text-gray-700 hover:bg-green-500 hover:text-white'
+                  } group transition-all duration-200`}
                 >
                   <FontAwesomeIcon
                     icon={faUser}
@@ -680,11 +680,11 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
               <li>
                 <Link
                   to="/logout"
-                  className="flex items-center px-3 py-2.5 text-red-400 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-700 transition-colors duration-150"
+                  className="flex items-center px-3 py-2.5 text-red-400 rounded-lg hover:bg-red-50 hover:text-red-700 transition-colors duration-150"
                 >
                   <FontAwesomeIcon
                     icon={faArrowRightFromBracket}
-                    className={`w-5 h-5 ${isCollapsed ? 'mx-auto' : 'text-gray-500'} group-hover:text-red-600`}
+                    className={`w-5 h-5 ${isCollapsed ? 'mx-auto' : ''} text-red-400 group-hover:text-red-600`}
                   />
                   {!isCollapsed && <span className="ml-3 whitespace-nowrap">Logout</span>}
                 </Link>

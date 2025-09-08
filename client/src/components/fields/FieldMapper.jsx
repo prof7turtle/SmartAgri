@@ -380,7 +380,7 @@ const FieldMapper = () => {
               disabled={loading}
             >
               <FontAwesomeIcon icon={faSave} className="mr-2" />
-              {loading ? 'Saving...' : 'Save Field'}
+              {loading ? 'Saving...' : 'Save'}
             </button>
             
             <button 
@@ -389,7 +389,7 @@ const FieldMapper = () => {
               disabled={loading}
             >
               <FontAwesomeIcon icon={faEraser} className="mr-2" />
-              Clear All
+              Clear
             </button>
           </div>
         </div>
