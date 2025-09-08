@@ -6,6 +6,8 @@ import FarmConsole from './pages/FarmConsole';
 import AIAssistant from './pages/AIAssistant';
 import CropManagement from './pages/CropManagement';
 import CreateField from './pages/CreateField';
+import Fields from './pages/Fields';
+import FieldDetail from './pages/FieldDetail';
 import FinancialAid from './pages/FinancialAid';
 import { AppProvider } from './context/AppContext';
 import VegetationAnalysis from './components/climate/VegetationAnalysis'
@@ -31,6 +33,8 @@ function App() {
             <Route path="/vegetation" element={<VegetationAnalysis />} />
             <Route path="/monsoon" element={<WaterIrrigationAnalysis dateRange={{startDate: '2025-01-01', endDate: '2025-09-01'}} />} />
             <Route path="/create-field" element={<CreateField />} />
+            <Route path="/field-list" element={<Fields />} />
+            <Route path="/field-detail/:id" element={<FieldDetail />} />
             <Route path="*" element={<h1>Page Not Found</h1>} />
           </Routes>
         </Layout>

@@ -16,7 +16,17 @@ import { useAppContext } from '../../context/AppContext';
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { selectedField, setSelectedField, selectedLocation, setSelectedLocation, fields, addField } = useAppContext();
+  
+  // Safely use context with default values if context is undefined
+  const contextValue = useAppContext() || {};
+  const { 
+    selectedField = '', 
+    setSelectedField = () => {}, 
+    selectedLocation = '', 
+    setSelectedLocation = () => {}, 
+    fields = [], 
+    addField = () => {} 
+  } = contextValue;
   
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');

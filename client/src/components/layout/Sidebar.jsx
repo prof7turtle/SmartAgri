@@ -149,6 +149,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                     {!isCollapsed && <span className="ml-3 whitespace-nowrap">Reports</span>}
                   </Link>
                 </li>
+                
                 {/* <li>
                   <Link
                     to="/farm-console"
@@ -196,6 +197,76 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                     />
                     {!isCollapsed && <span className="ml-3 whitespace-nowrap">Financial Aid</span>}
                   </Link>
+                </li>
+              </ul>
+            </div>
+             {/* Field Management */}
+            <div className={`px-3 py-2 ${!isCollapsed && 'mb-1'}`}>
+              {!isCollapsed && (
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Field Management
+                </h3>
+              )}
+              <ul className="mt-1 space-y-1">
+                <li>
+                  <button
+                    type="button"
+                    className={`flex items-center w-full px-3 py-2.5 rounded-lg text-left text-gray-700 ${
+                      isCollapsed ? 'justify-center' : ''
+                    } hover:bg-gray-100 transition-colors duration-150`}
+                    onClick={() => toggleMenu('fields')}
+                  >
+                    <FontAwesomeIcon
+                      icon={faMap}
+                      className="w-5 h-5 text-gray-500 group-hover:text-gray-900"
+                    />
+                    {!isCollapsed && (
+                      <>
+                        <span className="ml-3 mr-auto font-medium">Fields</span>
+                        <FontAwesomeIcon
+                          icon={expandedMenus.fields ? faAngleDown : faAngleRight}
+                          className="w-4 h-4"
+                        />
+                      </>
+                    )}
+                  </button>
+
+                  {expandedMenus.fields && !isCollapsed && (
+                    <ul className="mt-1 pl-7 space-y-1">
+                      <li>
+                        <Link
+                          to="/create-field"
+                          className={`flex items-center px-3 py-2 rounded-md ${
+                            isActive('/create-field') 
+                              ? 'bg-green-50 text-green-800' 
+                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                          } transition-colors duration-150`}
+                        >
+                          <FontAwesomeIcon
+                            icon={faDraftingCompass}
+                            className={`w-4 h-4 mr-2 ${isActive('/create-field') ? 'text-green-700' : 'text-gray-500'}`}
+                          />
+                          <span>Create New Field</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/field-list"
+                          className={`flex items-center px-3 py-2 rounded-md ${
+                            isActive('/field-list') 
+                              ? 'bg-green-50 text-green-800' 
+                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                          } transition-colors duration-150`}
+                        >
+                          <FontAwesomeIcon
+                            icon={faLocationDot}
+                            className={`w-4 h-4 mr-2 ${isActive('/field-list') ? 'text-green-700' : 'text-gray-500'}`}
+                          />
+                          <span>My Fields</span>
+                        </Link>
+                      </li>
+                    </ul>
+                  )}
                 </li>
               </ul>
             </div>
@@ -523,76 +594,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
             </div>
 
             {/* AI Assistant */}
-            {/* Field Management */}
-            <div className={`px-3 py-2 ${!isCollapsed && 'mb-1'}`}>
-              {!isCollapsed && (
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Field Management
-                </h3>
-              )}
-              <ul className="mt-1 space-y-1">
-                <li>
-                  <button
-                    type="button"
-                    className={`flex items-center w-full px-3 py-2.5 rounded-lg text-left text-gray-700 ${
-                      isCollapsed ? 'justify-center' : ''
-                    } hover:bg-gray-100 transition-colors duration-150`}
-                    onClick={() => toggleMenu('fields')}
-                  >
-                    <FontAwesomeIcon
-                      icon={faMap}
-                      className="w-5 h-5 text-gray-500 group-hover:text-gray-900"
-                    />
-                    {!isCollapsed && (
-                      <>
-                        <span className="ml-3 mr-auto font-medium">Fields</span>
-                        <FontAwesomeIcon
-                          icon={expandedMenus.fields ? faAngleDown : faAngleRight}
-                          className="w-4 h-4"
-                        />
-                      </>
-                    )}
-                  </button>
-
-                  {expandedMenus.fields && !isCollapsed && (
-                    <ul className="mt-1 pl-7 space-y-1">
-                      <li>
-                        <Link
-                          to="/create-field"
-                          className={`flex items-center px-3 py-2 rounded-md ${
-                            isActive('/create-field') 
-                              ? 'bg-green-50 text-green-800' 
-                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                          } transition-colors duration-150`}
-                        >
-                          <FontAwesomeIcon
-                            icon={faDraftingCompass}
-                            className={`w-4 h-4 mr-2 ${isActive('/create-field') ? 'text-green-700' : 'text-gray-500'}`}
-                          />
-                          <span>Create New Field</span>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          to="/field-list"
-                          className={`flex items-center px-3 py-2 rounded-md ${
-                            isActive('/field-list') 
-                              ? 'bg-green-50 text-green-800' 
-                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                          } transition-colors duration-150`}
-                        >
-                          <FontAwesomeIcon
-                            icon={faLocationDot}
-                            className={`w-4 h-4 mr-2 ${isActive('/field-list') ? 'text-green-700' : 'text-gray-500'}`}
-                          />
-                          <span>My Fields</span>
-                        </Link>
-                      </li>
-                    </ul>
-                  )}
-                </li>
-              </ul>
-            </div>
+           
 
             {/* Tools */}
             <div className={`px-3 py-2 ${!isCollapsed && 'mb-1'}`}>

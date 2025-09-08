@@ -1,4 +1,5 @@
-import { createContext, useState, useContext } from 'react';
+import { createContext, useState, useContext, useEffect } from 'react';
+import { fetchFields } from '../services/dataService';
 
 // Create the context
 const AppContext = createContext();
@@ -13,10 +14,8 @@ export const AppProvider = ({ children }) => {
   const [selectedLocation, setSelectedLocation] = useState('');
   
   // State for field data
-  const [fields, setFields] = useState([
-    { id: 1, name: 'Farm 1', location: 'DIT Pune' },
-    { id: 2, name: 'Baramati', location: 'Baramati' }
-  ]);
+  const [fields, setFields] = useState([]);
+  const [loading, setLoading] = useState(true);
   
   // State for analytics data
   const [analyticsData, setAnalyticsData] = useState({
@@ -25,16 +24,35 @@ export const AppProvider = ({ children }) => {
     soil: {},
     water: {}
   });
-  
-  // Function to add a new field
-  const addField = (fieldName, location) => {
-    const newField = {
-      id: fields.length + 1,
-      name: fieldName,
-      location: location || selectedLocation
+
+  // Fetch fields from backend on component mount
+  useEffect(() => {
+    const loadFields = async () => {
+      try {
+        setLoading(true);
+        const fieldData = await fetchFields();
+        setFields(fieldData);
+        
+        // Select the first field by default if available
+        if (fieldData.length > 0 && !selectedField) {
+          setSelectedField(fieldData[0].id);
+          if (fieldData[0].location) {
+            setSelectedLocation(fieldData[0].location);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading fields:', error);
+      } finally {
+        setLoading(false);
+      }
     };
     
-    setFields([...fields, newField]);
+    loadFields();
+  }, []);
+  
+  // Function to add a new field (will be replaced with API call in production)
+  const addField = (field) => {
+    setFields([...fields, field]);
   };
   
   // Function to update analytics data
@@ -45,6 +63,19 @@ export const AppProvider = ({ children }) => {
     }));
   };
   
+  // Function to refresh fields from backend
+  const refreshFields = async () => {
+    try {
+      setLoading(true);
+      const fieldData = await fetchFields();
+      setFields(fieldData);
+    } catch (error) {
+      console.error('Error refreshing fields:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   // Values to be provided to consumers
   const value = {
     selectedField,
@@ -52,7 +83,9 @@ export const AppProvider = ({ children }) => {
     selectedLocation,
     setSelectedLocation,
     fields,
+    loading,
     addField,
+    refreshFields,
     analyticsData,
     updateAnalyticsData
   };
