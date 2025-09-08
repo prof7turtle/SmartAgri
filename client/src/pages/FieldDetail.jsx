@@ -48,14 +48,37 @@ const FieldDetail = () => {
     if (!field || !field.coordinates || field.coordinates.length < 3) return;
 
     const loadGoogleMapsScript = () => {
+      // Check if Google Maps is already loaded
       if (window.google && window.google.maps) {
         initMap();
         return;
       }
 
+      // Check if script is already being loaded
+      const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+      if (existingScript) {
+        // If script exists, wait for it to load
+        if (window.initMapCallback) {
+          const originalCallback = window.initMapCallback;
+          window.initMapCallback = () => {
+            originalCallback();
+            initMap();
+          };
+        } else {
+          // Wait for script to load
+          existingScript.addEventListener('load', () => {
+            if (window.google && window.google.maps) {
+              initMap();
+            }
+          });
+        }
+        return;
+      }
+
       const apiKey = "AIzaSyA3vUl0jnyrAi_awYheUAYjFNDKCUaDpeU";
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=drawing&callback=initMapCallback`;
+      // Remove deprecated drawing library and add async loading
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&loading=async&callback=initMapCallback`;
       script.async = true;
       script.defer = true;
       
