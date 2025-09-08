@@ -30,7 +30,10 @@ import {
   faBug,
   faSprayCan,
   faWheatAwn,
-  faPlantWilt
+  faPlantWilt,
+  faMap,
+  faDraftingCompass,
+  faLocationDot
 } from '@fortawesome/free-solid-svg-icons';
 
 const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
@@ -39,7 +42,8 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
     analytics: true,
     pests: false,
     crops: false,
-    irrigation: false
+    irrigation: false,
+    fields: false
   });
   
   // Detect screen size for responsive behavior
@@ -74,7 +78,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
   return (
     <aside 
       id="sidebar"
-      className={`fixed top-0 left-0 z-40 h-screen pt-14 transition-all duration-300 ease-in-out bg-gradient-to-b from-white to-gray-50 border-r border-gray-200 shadow-sm ${
+      className={`fixed top-0 left-0 z-40 h-screen pt-14 transition-all duration-300 ease-in-out bg-gradient-to-b from-green to-gray-50 border-r border-green-200 shadow-sm ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
       } ${isMobile ? 'w-72' : ''} ${!isMobile && isCollapsed ? 'md:w-20' : 'md:w-64'}` }
       aria-label="Sidebar"
@@ -484,6 +488,78 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
             </div>
 
             {/* AI Assistant */}
+            {/* Field Management */}
+            <div className={`px-3 py-2 ${!isCollapsed && 'mb-1'}`}>
+              {!isCollapsed && (
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Field Management
+                </h3>
+              )}
+              <ul className="mt-1 space-y-1">
+                <li>
+                  <button
+                    type="button"
+                    className={`flex items-center w-full px-3 py-2.5 rounded-lg text-left text-gray-700 ${
+                      isCollapsed ? 'justify-center' : ''
+                    } hover:bg-gray-100 transition-colors duration-150`}
+                    onClick={() => toggleMenu('fields')}
+                  >
+                    <FontAwesomeIcon
+                      icon={faMap}
+                      className="w-5 h-5 text-gray-500 group-hover:text-gray-900"
+                    />
+                    {!isCollapsed && (
+                      <>
+                        <span className="ml-3 mr-auto font-medium">Fields</span>
+                        <FontAwesomeIcon
+                          icon={expandedMenus.fields ? faAngleDown : faAngleRight}
+                          className="w-4 h-4"
+                        />
+                      </>
+                    )}
+                  </button>
+
+                  {expandedMenus.fields && !isCollapsed && (
+                    <ul className="mt-1 pl-7 space-y-1">
+                      <li>
+                        <Link
+                          to="/create-field"
+                          className={`flex items-center px-3 py-2 rounded-md ${
+                            isActive('/create-field') 
+                              ? 'bg-green-50 text-green-800' 
+                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                          } transition-colors duration-150`}
+                        >
+                          <FontAwesomeIcon
+                            icon={faDraftingCompass}
+                            className={`w-4 h-4 mr-2 ${isActive('/create-field') ? 'text-green-700' : 'text-gray-500'}`}
+                          />
+                          <span>Create New Field</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/field-list"
+                          className={`flex items-center px-3 py-2 rounded-md ${
+                            isActive('/field-list') 
+                              ? 'bg-green-50 text-green-800' 
+                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                          } transition-colors duration-150`}
+                        >
+                          <FontAwesomeIcon
+                            icon={faLocationDot}
+                            className={`w-4 h-4 mr-2 ${isActive('/field-list') ? 'text-green-700' : 'text-gray-500'}`}
+                          />
+                          <span>My Fields</span>
+                        </Link>
+                      </li>
+                    </ul>
+                  )}
+                </li>
+              </ul>
+            </div>
+
+            {/* Tools */}
             <div className={`px-3 py-2 ${!isCollapsed && 'mb-1'}`}>
               {!isCollapsed && (
                 <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
