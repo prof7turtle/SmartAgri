@@ -6,6 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import io
+import json
 import firebase_admin
 from google.cloud import storage
 from google.oauth2 import service_account
@@ -42,7 +43,25 @@ GCS_BUCKET_NAME = 'earth-engine-climate-data'
 bucket = storage_client.bucket(GCS_BUCKET_NAME)
 
 
-aoi = ee.Geometry.Rectangle([73.70, 18.65, 73.71, 18.66])
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+env_path = os.path.join(parent_dir, '.env')
+load_dotenv(env_path)
+
+
+coord_string = os.getenv("COORDINATES")
+if not coord_string:
+    raise ValueError("COORDINATES not found in parent directory .env")
+
+try:
+    coordinates = json.loads(coord_string)  # Expecting something like [[lon, lat], [lon, lat], ...]
+except json.JSONDecodeError as e:
+    raise ValueError(f"COORDINATES in .env is not valid JSON: {e}")
+###########################################################################
+
+if coordinates[0] != coordinates[-1]:
+    coordinates.append(coordinates[0])
+
+aoi = ee.Geometry.Polygon(coordinates)
 
 s2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') \
     .filterBounds(aoi) \

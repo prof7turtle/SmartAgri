@@ -59,8 +59,27 @@ GCS_BUCKET_NAME = 'earth-engine-climate-data'
 # storage_client = storage.Client()
 bucket = storage_client.bucket(GCS_BUCKET_NAME)
 
+#########################################  .env excess #####################################
 
-aoi = ee.Geometry.Rectangle([73.70, 18.65, 73.71, 18.66])
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+env_path = os.path.join(parent_dir, '.env')
+load_dotenv(env_path)
+
+
+coord_string = os.getenv("COORDINATES")
+if not coord_string:
+    raise ValueError("COORDINATES not found in parent directory .env")
+
+try:
+    coordinates = json.loads(coord_string)  # Expecting something like [[lon, lat], [lon, lat], ...]
+except json.JSONDecodeError as e:
+    raise ValueError(f"COORDINATES in .env is not valid JSON: {e}")
+###########################################################################
+
+if coordinates[0] != coordinates[-1]:
+    coordinates.append(coordinates[0])
+
+aoi = ee.Geometry.Polygon(coordinates)
 
 s2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') \
     .filterBounds(aoi) \
@@ -232,6 +251,17 @@ for index in parameters:
             for blob in blobs:
                 if blob.name.endswith(".csv"):
                     upload_csv_blob_to_firebase(GCS_BUCKET_NAME, blob.name, index)
+
+                    LOCAL_DIR = r"I:\Projects\SmartAgri\client\local_csv"   # 🔹 change this to your preferred folder
+
+                    os.makedirs(LOCAL_DIR, exist_ok=True)   
+
+                    local_filename = os.path.basename(blob.name)
+                    destination_file_path = os.path.join(LOCAL_DIR, local_filename)
+
+                    blob.download_to_filename(destination_file_path)
+
+                    print(f"✅ File downloaded locally: {destination_file_path}")
 
                     # filename = os.path.basename(blob.name)
                     # destination_file_name = os.path.join(r"I:\Projects\Climate-Resilient-Agriculture\System\server",filename)
