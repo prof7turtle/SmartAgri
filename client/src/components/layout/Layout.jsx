@@ -2,14 +2,15 @@ import { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faXmark, faLeaf } from '@fortawesome/free-solid-svg-icons';
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   
-  // Check screen size
+  // Check screen size and scroll position
   useEffect(() => {
     const checkIfMobile = () => {
       const isMobileView = window.innerWidth < 768;
@@ -28,9 +29,19 @@ const Layout = ({ children }) => {
       }
     };
     
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setIsScrolled(scrollPosition > 10);
+    };
+    
     checkIfMobile();
     window.addEventListener('resize', checkIfMobile);
-    return () => window.removeEventListener('resize', checkIfMobile);
+    window.addEventListener('scroll', handleScroll);
+    
+    return () => {
+      window.removeEventListener('resize', checkIfMobile);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, [isMobile]);
   
   // Close sidebar when clicking outside on mobile
@@ -57,14 +68,14 @@ const Layout = ({ children }) => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-100 to-green-100 border-r border-green-200 shadow-sm overflow-hidden">
-      <Navbar />
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 via-white to-green-50 overflow-hidden">
+      <Navbar isScrolled={isScrolled} />
       
       {/* Mobile Menu Button */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
         type="button"
-        className="md:hidden fixed bottom-4 right-4 z-50 inline-flex items-center p-2 text-sm rounded-lg bg-green-600 text-white hover:bg-green-700 w-12 h-12 justify-center shadow-lg"
+        className="md:hidden fixed bottom-6 right-6 z-50 flex items-center justify-center p-3 rounded-full bg-gradient-to-r from-green-600 to-green-500 text-white hover:from-green-700 hover:to-green-600 shadow-xl transition-all duration-300 transform hover:scale-105"
         aria-controls="sidebar"
         aria-expanded={sidebarOpen}
       >
@@ -76,7 +87,7 @@ const Layout = ({ children }) => {
       {sidebarOpen && isMobile && (
         <div 
           onClick={() => setSidebarOpen(false)} 
-          className="fixed inset-0 z-30 bg-gray-900 bg-opacity-50 transition-opacity md:hidden"
+          className="fixed inset-0 z-30 bg-gray-900 bg-opacity-60 backdrop-blur-sm transition-all duration-300 md:hidden"
           aria-hidden="true"
         ></div>
       )}
@@ -85,14 +96,31 @@ const Layout = ({ children }) => {
       <Sidebar isSidebarOpen={sidebarOpen} isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} />
       
       {/* Main Content */}
-      <div className={`flex-1 transition-all duration-300 mt-16 ${
-        isMobile ? 'ml-0' : (isCollapsed ? 'md:ml-20' : 'md:ml-64')
-      }`}>
+      <div 
+        className={`flex-1 transition-all duration-300 mt-16 ${
+          isMobile ? 'ml-0' : (isCollapsed ? 'md:ml-20' : 'md:ml-64')
+        }`}
+      >
         <main className="p-4 md:p-6">
-          <div className="mx-auto">
-            {children}
+          <div className="container mx-auto px-0 sm:px-4">
+            <div className="transition-all duration-500 ease-in-out">
+              {children}
+            </div>
           </div>
         </main>
+        
+        {/* Footer with branding */}
+        <footer className="bg-white/50 backdrop-blur-sm py-4 border-t border-green-100">
+          <div className="container mx-auto px-6 flex flex-col sm:flex-row justify-between items-center">
+            <div className="flex items-center mb-4 sm:mb-0">
+              <FontAwesomeIcon icon={faLeaf} className="text-green-500 mr-2" />
+              <span className="text-sm text-gray-600">Smart Agriculture © 2025</span>
+            </div>
+            <div className="text-sm text-gray-500">
+              Sustainable farming for a better tomorrow
+            </div>
+          </div>
+        </footer>
       </div>
     </div>
   );

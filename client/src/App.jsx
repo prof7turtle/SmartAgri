@@ -5,11 +5,8 @@ import ClimateAnalysis from './pages/ClimateAnalysis';
 import FarmConsole from './pages/FarmConsole';
 import AIAssistant from './pages/AIAssistant';
 import CropManagement from './pages/CropManagement';
-<<<<<<< HEAD
 import CreateField from './pages/CreateField';
-=======
 import FinancialAid from './pages/FinancialAid';
->>>>>>> e5f4222c4388ef7a7d017f813651e76c931b598b
 import { AppProvider } from './context/AppContext';
 import VegetationAnalysis from './components/climate/VegetationAnalysis'
 import SoilLandAnalysis from './components/climate/SoilLandAnalysis'

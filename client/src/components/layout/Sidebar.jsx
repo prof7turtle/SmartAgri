@@ -149,7 +149,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                     {!isCollapsed && <span className="ml-3 whitespace-nowrap">Reports</span>}
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link
                     to="/farm-console"
                     className={`flex items-center px-3 py-2.5 rounded-lg ${isCollapsed ? 'justify-center' : ''} ${
@@ -164,7 +164,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                     />
                     {!isCollapsed && <span className="ml-3 whitespace-nowrap">Farm Console</span>}
                   </Link>
-                </li>
+                </li> */}
                 <li>
                   <Link
                     to="/crop-management"
@@ -381,7 +381,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                 </li>
                 
                 {/* Crop Management Section */}
-                <li>
+                {/* <li>
                   <button
                     type="button"
                     className={`flex items-center w-full px-3 py-2.5 rounded-lg text-left text-gray-700 ${
@@ -456,7 +456,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                       </li>
                     </ul>
                   )}
-                </li>
+                </li> */}
                 
                 {/* Irrigation Management Section */}
                 <li>
