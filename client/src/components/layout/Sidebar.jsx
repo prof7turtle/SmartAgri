@@ -262,7 +262,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                           <span>Vegetation Health</span>
                         </Link>
                       </li>
-                      <li>
+                      {/* <li>
                         <Link
                           to="/hazards"
                           className={`flex items-center px-3 py-2 rounded-md ${
@@ -277,7 +277,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                           />
                           <span>Hazard Activities</span>
                         </Link>
-                      </li>
+                      </li> */}
                       <li>
                         <Link
                           to="/monsoon"
@@ -291,7 +291,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                             icon={faCloudRain}
                             className={`w-4 h-4 mr-2 ${isActive('/monsoon') ? 'text-green-700' : 'text-gray-500'}`}
                           />
-                          <span>Monsoon Info</span>
+                          <span>Water Irrigation</span>
                         </Link>
                       </li>
                       <li>

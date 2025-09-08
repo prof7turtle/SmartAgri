@@ -7,6 +7,9 @@ import AIAssistant from './pages/AIAssistant';
 import CropManagement from './pages/CropManagement';
 import FinancialAid from './pages/FinancialAid';
 import { AppProvider } from './context/AppContext';
+import VegetationAnalysis from './components/climate/VegetationAnalysis'
+import SoilLandAnalysis from './components/climate/SoilLandAnalysis'
+import WaterIrrigationAnalysis from './components/climate/WaterIrrigationAnalysis'
 
 function App() {
   return (
@@ -23,6 +26,9 @@ function App() {
             <Route path="/financial-aid" element={<FinancialAid />} />
             <Route path="/reports" element={<h1>Reports Page (Coming Soon)</h1>} />
             <Route path="/ai-assistant" element={<AIAssistant />} />
+            <Route path="/soil" element={<SoilLandAnalysis />} />
+            <Route path="/vegetation" element={<VegetationAnalysis />} />
+            <Route path="/monsoon" element={<WaterIrrigationAnalysis dateRange={{startDate: '2025-01-01', endDate: '2025-09-01'}} />} />
             <Route path="*" element={<h1>Page Not Found</h1>} />
           </Routes>
         </Layout>
