@@ -261,9 +261,9 @@ const handleSetSelectedField = (fieldId) => {
 
 Our interdisciplinary team combines expertise in agricultural science, remote sensing, software development, and UI/UX design:
 
-- **Team Member 3** - Remote Sensing Specialist
-- **Team Member 4** - UI/UX Designer
-- **Sujal Pawar** - Full-Stack Developer
+- **Harshil Bohra**
+- **Hariom Phulre**
+- **Sujal Pawar**
 
 ## 🙏 Acknowledgments
 
