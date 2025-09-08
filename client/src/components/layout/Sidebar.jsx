@@ -316,7 +316,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
 
                   {expandedMenus.analytics && !isCollapsed && (
                     <ul className="mt-1 pl-7 space-y-1">
-                      <li>
+                      {/* <li>
                         <Link
                           to="/climate"
                           className={`flex items-center px-3 py-2.5 rounded-md ${
@@ -331,7 +331,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                           />
                           <span>Weather Forecast</span>
                         </Link>
-                      </li>
+                      </li> */}
                       <li>
                         <Link
                           to="/vegetation"
@@ -345,7 +345,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                             icon={faLeaf}
                             className={`w-4 h-4 mr-2 ${isActive('/vegetation') ? 'text-green-700' : 'text-gray-500'}`}
                           />
-                          <span>Vegetation Health</span>
+                          <span>Soil & Vegetation</span>
                         </Link>
                       </li>
                       {/* <li>
@@ -380,7 +380,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                           <span>Water Irrigation</span>
                         </Link>
                       </li>
-                      <li>
+                      {/* <li>
                         <Link
                           to="/soil"
                           className={`flex items-center px-3 py-2 rounded-md ${
@@ -395,7 +395,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                           />
                           <span>Soil Info</span>
                         </Link>
-                      </li>
+                      </li> */}
                     </ul>
                   )}
                 </li>
@@ -661,7 +661,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                   {!isCollapsed && <span className="ml-3 whitespace-nowrap">Admin</span>}
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   to="/settings"
                   className={`flex items-center px-3 py-2.5 rounded-lg ${isCollapsed ? 'justify-center' : ''} ${
@@ -676,11 +676,11 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                   />
                   {!isCollapsed && <span className="ml-3 whitespace-nowrap">Settings</span>}
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link
                   to="/logout"
-                  className="flex items-center px-3 py-2.5 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-700 transition-colors duration-150"
+                  className="flex items-center px-3 py-2.5 text-red-400 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-700 transition-colors duration-150"
                 >
                   <FontAwesomeIcon
                     icon={faArrowRightFromBracket}

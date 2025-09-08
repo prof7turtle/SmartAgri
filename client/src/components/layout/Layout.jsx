@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
+import ChatbotButton from '../common/ChatbotButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faXmark } from '@fortawesome/free-solid-svg-icons';
 
@@ -75,7 +76,7 @@ const Layout = ({ children }) => {
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
         type="button"
-        className="md:hidden fixed bottom-6 right-6 z-50 inline-flex items-center p-2 text-sm rounded-full bg-green-600 text-white hover:bg-green-700 w-14 h-14 justify-center shadow-xl"
+        className="md:hidden fixed bottom-6 left-6 z-50 inline-flex items-center p-2 text-sm rounded-full bg-green-600 text-white hover:bg-green-700 w-14 h-14 justify-center shadow-xl"
         aria-controls="sidebar"
         aria-expanded={sidebarOpen}
         aria-label="Toggle sidebar"
@@ -83,6 +84,9 @@ const Layout = ({ children }) => {
         <span className="sr-only">Toggle sidebar</span>
         <FontAwesomeIcon icon={sidebarOpen ? faXmark : faBars} className="text-xl" />
       </button>
+      
+      {/* Chatbot Button - available on all screen sizes */}
+      <ChatbotButton />
       
       {/* Dark Overlay - visible when mobile sidebar is open */}
       {sidebarOpen && isMobile && (
