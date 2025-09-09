@@ -418,7 +418,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                 </li>
                 
                 {/* Pest Detection Section */}
-                <li>
+                {/* <li>
                   <button
                     type="button"
                     className={`flex items-center w-full px-3 py-2.5 rounded-lg text-left text-gray-700 ${
@@ -477,7 +477,7 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                       </li>
                     </ul>
                   )}
-                </li>
+                </li> */}
                 
                 {/* Crop Management Section */}
                 {/* <li>
