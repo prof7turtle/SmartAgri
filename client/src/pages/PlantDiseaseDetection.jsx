@@ -80,7 +80,7 @@ const PlantDiseaseDetection = () => {
       formData.append('image', selectedFile);
 
       // Upload image to server
-      const response = await fetch('http://localhost:3001/api/upload-disease-image', {
+      const response = await fetch('http://localhost:5000/api/upload-disease-image', {
         method: 'POST',
         body: formData,
       });
@@ -94,7 +94,7 @@ const PlantDiseaseDetection = () => {
       if (result.success) {
         // Set result image path with timestamp to force refresh
         const timestamp = new Date().getTime();
-        setResultImage(`http://localhost:3001/detect_results/disease/result_1.png?t=${timestamp}`);
+        setResultImage(`http://localhost:5000/detect_results/disease/result_1.png?t=${timestamp}`);
         
         // Set disease information
         setDiseaseInfo(result.diseaseInfo || {

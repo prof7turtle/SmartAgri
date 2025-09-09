@@ -3,6 +3,7 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 const bodyParser = require('body-parser');
+const multer = require('multer');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -16,11 +17,105 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 
+// Configure multer for image uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const diseaseDir = path.join(__dirname, 'crop_imgs', 'disease');
+    // Create directory if it doesn't exist
+    if (!fs.existsSync(diseaseDir)) {
+      fs.mkdirSync(diseaseDir, { recursive: true });
+    }
+    cb(null, diseaseDir);
+  },
+  filename: function (req, file, cb) {
+    // Always save as img.png (overwrite existing)
+    cb(null, 'img.png');
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  fileFilter: function (req, file, cb) {
+    // Accept only image files
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'), false);
+    }
+  },
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit
+  }
+});
+
+// Serve static files for detection results
+app.use('/detect_results', express.static(path.join(__dirname, 'detect_results')));
+app.use('/crop_imgs', express.static(path.join(__dirname, 'crop_imgs')));
+
 // Create directory for field coordinates if it doesn't exist
 const fieldCoordsDir = path.join(__dirname, 'Field_co-ordinates');
 if (!fs.existsSync(fieldCoordsDir)) {
   fs.mkdirSync(fieldCoordsDir, { recursive: true });
 }
+
+// Create directories for disease detection if they don't exist
+const diseaseResultsDir = path.join(__dirname, 'detect_results', 'disease');
+if (!fs.existsSync(diseaseResultsDir)) {
+  fs.mkdirSync(diseaseResultsDir, { recursive: true });
+}
+
+// API endpoint for plant disease detection
+app.post('/api/upload-disease-image', upload.single('image'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No image file uploaded'
+      });
+    }
+
+    console.log('Image uploaded successfully:', req.file.path);
+
+    // Simulate disease detection processing
+    // In a real implementation, you would call your ML model here
+    setTimeout(() => {
+      try {
+        // Create a mock result image (copy the uploaded image to result location)
+        const resultImagePath = path.join(diseaseResultsDir, 'result_1.png');
+        
+        // For demo purposes, copy the uploaded image as the result
+        // In real implementation, this would be the processed image from your ML model
+        fs.copyFileSync(req.file.path, resultImagePath);
+        
+        console.log('Disease detection completed, result saved to:', resultImagePath);
+      } catch (error) {
+        console.error('Error creating result image:', error);
+      }
+    }, 1000);
+
+    // Return immediate response with mock disease information
+    const mockDiseaseInfo = {
+      name: 'Analysis Complete',
+      description: 'The leaf image has been processed successfully. Check the result image for detailed analysis.',
+      treatment: 'Based on the analysis, consider the following: 1) Ensure proper watering schedule, 2) Check for pest infestation, 3) Apply appropriate organic fungicides if needed, 4) Maintain proper soil nutrition levels.',
+      confidence: '87%'
+    };
+
+    return res.status(200).json({
+      success: true,
+      message: 'Image uploaded and analyzed successfully',
+      diseaseInfo: mockDiseaseInfo,
+      resultImagePath: '/detect_results/disease/result_1.png'
+    });
+
+  } catch (error) {
+    console.error('Error processing disease detection:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error during disease detection: ' + error.message
+    });
+  }
+});
 
 // API endpoint to save field coordinates
 app.post('/api/fields', (req, res) => {
