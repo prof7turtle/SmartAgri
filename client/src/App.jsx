@@ -10,6 +10,7 @@ import Fields from './pages/Fields';
 import FieldDetail from './pages/FieldDetail';
 import FinancialAid from './pages/FinancialAid';
 import WaterManagement from './pages/WaterManagement';
+import PlantDiseaseDetection from './pages/PlantDiseaseDetection';
 import { AppProvider } from './context/AppContext';
 import VegetationAnalysis from './components/climate/VegetationAnalysis'
 import SoilLandAnalysis from './components/climate/SoilLandAnalysis'
@@ -38,6 +39,7 @@ function App() {
             <Route path="/create-field" element={<CreateField />} />
             <Route path="/field-list" element={<Fields />} />
             <Route path="/field-detail/:id" element={<FieldDetail />} />
+            <Route path="/plant-disease-detection" element={<PlantDiseaseDetection />} />
             <Route path="*" element={<h1>Page Not Found</h1>} />
           </Routes>
         </Layout>

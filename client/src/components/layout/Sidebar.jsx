@@ -36,7 +36,8 @@ import {
   faLocationDot,
   faHandshake,
   faRupeeSign,
-  faWarehouse
+  faWarehouse,
+  faMicroscope
 } from '@fortawesome/free-solid-svg-icons';
 
 const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
@@ -205,6 +206,22 @@ const Sidebar = ({ isSidebarOpen, isCollapsed, toggleSidebar }) => {
                       className={`w-5 h-5 ${isActive('/financial-aid') ? 'text-green-700' : 'text-gray-500 group-hover:text-gray-900'}`}
                     />
                     {!isCollapsed && <span className="ml-3 whitespace-nowrap">Financial Aid</span>}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/plant-disease-detection"
+                    className={`flex items-center px-3 py-2.5 rounded-lg ${isCollapsed ? 'justify-center' : ''} ${
+                      isActive('/plant-disease-detection') 
+                        ? 'bg-green-100 text-green-800 font-medium shadow-sm border-l-4 border-green-600' 
+                        : 'text-gray-700 hover:bg-green-100 hover:text-green-700'
+                    } group transition-all duration-200`}
+                  >
+                    <FontAwesomeIcon
+                      icon={faMicroscope}
+                      className={`w-5 h-5 ${isActive('/plant-disease-detection') ? 'text-green-700' : 'text-gray-500 group-hover:text-gray-900'}`}
+                    />
+                    {!isCollapsed && <span className="ml-3 whitespace-nowrap">Plant Disease Detect</span>}
                   </Link>
                 </li>
               </ul>
